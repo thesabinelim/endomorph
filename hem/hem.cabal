@@ -1,0 +1,21 @@
+cabal-version:      3.0
+name:               hem
+version:            0.1.0.0
+synopsis:           Haskell Endomorph compiler.
+description:        Compiler for the Endomorph programming language.
+license:            MIT
+author:             Sabine Lim
+maintainer:         i@sab.gg
+build-type:         Simple
+
+common warnings
+    ghc-options: -Wall
+
+executable hem
+    default-language: Haskell2010
+    hs-source-dirs:   src
+    main-is:          Main.hs
+    import:
+        warnings
+    build-depends:
+        base            ^>=4.17.2.0
