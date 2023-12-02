@@ -1,5 +1,6 @@
 module Endomorph.Lexer where
 
+import Data.Char (isSpace)
 import Data.Void (Void)
 import Text.Megaparsec
   ( between
@@ -8,51 +9,37 @@ import Text.Megaparsec
   , many
   , Parsec
   , ParseErrorBundle
-  , runParser )
+  , runParser
+  , takeWhile1P )
 import Text.Megaparsec.Char (space1)
-import qualified Text.Megaparsec.Char.Lexer as L
-  ( lexeme
-  , skipLineComment
-  , skipBlockComment
-  , space
-  , symbol )
 
 import Endomorph.Lexer.Common (Parser)
 import Endomorph.Lexer.Identifier (identifier)
 import Endomorph.Lexer.Literal (literal)
 import Endomorph.Lexer.Operator (operator)
 import Endomorph.Lexer.Punctuation (punctuation)
-import Endomorph.Token (Token(EndOfInput))
+import Endomorph.Token (Token(EndOfInput, Whitespace))
 
 lex :: String -> Either (ParseErrorBundle String Void) [Token]
 lex = runParser (tokens <* endOfInput) "stdin"
 
 tokens :: Parser [Token]
-tokens = many . lexeme $ token
+tokens = many token
 
 token :: Parser Token
 token = choice
   [ identifier
   , literal
   , operator
-  , punctuation ]
+  , punctuation
+  , whitespace ]
 
 endOfInput :: Parser Token
 endOfInput = do
   eof
   return EndOfInput
 
-parens :: Parser a -> Parser a
-parens = between (symbol "(") (symbol ")")
-
-lexeme :: Parser Token -> Parser Token
-lexeme = L.lexeme spacesAndComments
-
-symbol :: String -> Parser String
-symbol = L.symbol spacesAndComments
-
-spacesAndComments :: Parser ()
-spacesAndComments = L.space
-  space1
-  (L.skipLineComment "//")
-  (L.skipBlockComment "/*" "*/")
+whitespace :: Parser Token
+whitespace = do
+  spaces <- takeWhile1P (Just "whitespace") isSpace
+  return $ Whitespace spaces

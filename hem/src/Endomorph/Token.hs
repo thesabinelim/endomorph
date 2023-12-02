@@ -7,6 +7,7 @@ data Token
   | Literal Literal
   | Operator Operator
   | Punctuation Punctuation
+  | Whitespace String
   deriving Show
 
 data Keyword
