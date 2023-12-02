@@ -4,6 +4,7 @@ import Text.Megaparsec (choice)
 import Text.Megaparsec.Char (char, string)
 
 import Endomorph.Lexer.Common (Parser)
+import Endomorph.Lexer.Util (symbol)
 import Endomorph.Token (Token(Punctuation), Punctuation(..))
 
 punctuation :: Parser Token
@@ -19,46 +20,28 @@ punctuation = choice
   , semicolon ]
 
 colon :: Parser Token
-colon = do
-  char ':'
-  return $ Punctuation Colon
+colon = symbol ":" $ Punctuation Colon
 
 comma :: Parser Token
-comma = do
-  char ','
-  return $ Punctuation Comma
+comma = symbol "," $ Punctuation Comma
 
 lBrace :: Parser Token
-lBrace = do
-  char '{'
-  return $ Punctuation LBrace
+lBrace = symbol "{" $ Punctuation LBrace
 
 lBracket :: Parser Token
-lBracket = do
-  char '['
-  return $ Punctuation LBracket
+lBracket = symbol "[" $ Punctuation LBracket
 
 lParens :: Parser Token
-lParens = do
-  char '('
-  return $ Punctuation LParens
+lParens = symbol "(" $ Punctuation LParens
 
 rBrace :: Parser Token
-rBrace = do
-  char '}'
-  return $ Punctuation RBrace
+rBrace = symbol "}" $ Punctuation RBrace
 
 rParens :: Parser Token
-rParens = do
-  char ')'
-  return $ Punctuation RParens
+rParens = symbol ")" $ Punctuation RParens
 
 rBracket :: Parser Token
-rBracket = do
-  char ']'
-  return $ Punctuation RBracket
+rBracket = symbol "]" $ Punctuation RBracket
 
 semicolon :: Parser Token
-semicolon = do
-  char ';'
-  return $ Punctuation Semicolon
+semicolon = symbol ";" $ Punctuation Semicolon

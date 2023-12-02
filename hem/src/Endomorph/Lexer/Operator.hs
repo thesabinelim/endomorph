@@ -6,6 +6,7 @@ import Text.Megaparsec (choice)
 import Text.Megaparsec.Char (char, string)
 
 import Endomorph.Lexer.Common (Parser)
+import Endomorph.Lexer.Util (symbol)
 import Endomorph.Token (Token(Operator), Operator(..))
 
 operator :: Parser Token
@@ -44,166 +45,100 @@ operator = choice
   , times ]
 
 and :: Parser Token
-and = do
-  char '&'
-  return $ Operator And
+and = symbol "&" $ Operator And
 
 andAssign :: Parser Token
-andAssign = do
-  string "&="
-  return $ Operator AndAssign
+andAssign = symbol "&=" $ Operator AndAssign
 
 arrow :: Parser Token
-arrow = do
-  string "->"
-  return $ Operator Arrow
+arrow = symbol "->" $ Operator Arrow
 
 assign :: Parser Token
-assign = do
-  char '='
-  return $ Operator Assign
+assign = symbol "=" $ Operator Assign
 
 divide :: Parser Token
-divide = do
-  char '/'
-  return $ Operator Divide
+divide = symbol "/" $ Operator Divide
 
 divideAssign :: Parser Token
-divideAssign = do
-  char '/'
-  return $ Operator DivideAssign
+divideAssign = symbol "/=" $ Operator DivideAssign
 
 dot :: Parser Token
-dot = do
-  char '.'
-  return $ Operator Dot
+dot = symbol "." $ Operator Dot
 
 equality :: Parser Token
-equality = do
-  string "=="
-  return $ Operator Equality
+equality = symbol "==" $ Operator Equality
 
 greater :: Parser Token
-greater = do
-  char '>'
-  return $ Operator Greater
+greater = symbol ">" $ Operator Greater
 
 greaterEquals :: Parser Token
-greaterEquals = do
-  string ">="
-  return $ Operator GreaterEquals
+greaterEquals = symbol ">=" $ Operator GreaterEquals
 
 less :: Parser Token
-less = do
-  char '<'
-  return $ Operator Less
+less = symbol "<" $ Operator Less
 
 lessEquals :: Parser Token
-lessEquals = do
-  string "<="
-  return $ Operator LessEquals
+lessEquals = symbol "<=" $ Operator LessEquals
 
 lShift :: Parser Token
-lShift = do
-  string "<<"
-  return $ Operator LShift
+lShift = symbol "<<" $ Operator LShift
 
 lShiftAssign :: Parser Token
-lShiftAssign = do
-  string "<<="
-  return $ Operator LShiftAssign
+lShiftAssign = symbol "<<=" $ Operator LShiftAssign
 
 minus :: Parser Token
-minus = do
-  char '-'
-  return $ Operator Minus
+minus = symbol "-" $ Operator Minus
 
 minusAssign :: Parser Token
-minusAssign = do
-  string "-="
-  return $ Operator MinusAssign
+minusAssign = symbol "-=" $ Operator MinusAssign
 
 modulo :: Parser Token
-modulo = do
-  char '%'
-  return $ Operator Modulo
+modulo = symbol "%" $ Operator Modulo
 
 moduloAssign :: Parser Token
-moduloAssign = do
-  string "%="
-  return $ Operator ModuloAssign
+moduloAssign = symbol "%=" $ Operator ModuloAssign
 
 not :: Parser Token
-not = do
-  char '!'
-  return $ Operator Not
+not = symbol "!" $ Operator Not
 
 notEquals :: Parser Token
-notEquals = do
-  string "!="
-  return $ Operator NotEquals
+notEquals = symbol "!=" $ Operator NotEquals
 
 or :: Parser Token
-or = do
-  char '|'
-  return $ Operator Or
+or = symbol "|" $ Operator Or
 
 orAssign :: Parser Token
-orAssign = do
-  string "|="
-  return $ Operator OrAssign
+orAssign = symbol "|=" $ Operator OrAssign
 
 plus :: Parser Token
-plus = do
-  char '+'
-  return $ Operator Plus
+plus = symbol "+" $ Operator Plus
 
 plusAssign :: Parser Token
-plusAssign = do
-  string "+="
-  return $ Operator PlusAssign
+plusAssign = symbol "+=" $ Operator PlusAssign
 
 power :: Parser Token
-power = do
-  string "**"
-  return $ Operator Power
+power = symbol "**" $ Operator Power
 
 powerAssign :: Parser Token
-powerAssign = do
-  string "**="
-  return $ Operator PowerAssign
+powerAssign = symbol "**=" $ Operator PowerAssign
 
 question :: Parser Token
-question = do
-  char '?'
-  return $ Operator Question
+question = symbol "?" $ Operator Question
 
 rShift :: Parser Token
-rShift = do
-  string ">>"
-  return $ Operator RShift
+rShift = symbol ">>" $ Operator RShift
 
 rShiftAssign :: Parser Token
-rShiftAssign = do
-  string ">>="
-  return $ Operator RShiftAssign
+rShiftAssign = symbol ">>=" $ Operator RShiftAssign
 
 times :: Parser Token
-times = do
-  char '*'
-  return $ Operator Times
+times = symbol "*" $ Operator Times
 
 timesAssign :: Parser Token
-timesAssign = do
-  string "*="
-  return $ Operator TimesAssign
+timesAssign = symbol "*=" $ Operator TimesAssign
 
 xor :: Parser Token
-xor = do
-  char '^'
-  return $ Operator Xor
+xor = symbol "^" $ Operator Xor
 
 xorAssign :: Parser Token
-xorAssign = do
-  string "^="
-  return $ Operator XorAssign
+xorAssign = symbol "^=" $ Operator XorAssign

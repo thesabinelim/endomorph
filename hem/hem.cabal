@@ -22,6 +22,7 @@ executable hem
         Endomorph.Lexer.Literal
         Endomorph.Lexer.Operator
         Endomorph.Lexer.Punctuation
+        Endomorph.Lexer.Util
         Endomorph.Token
     import:
         warnings
