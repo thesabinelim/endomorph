@@ -10,7 +10,8 @@ import Endomorph.Token (Token(Operator), Operator(..))
 
 operator :: Parser Token
 operator = choice
-  [ equality
+  [ arrow
+  , equality
   , greaterEquals
   , lessEquals
   , lShift
@@ -33,6 +34,11 @@ and :: Parser Token
 and = do
   char '&'
   return $ Operator And
+
+arrow :: Parser Token
+arrow = do
+  string "->"
+  return $ Operator Arrow
 
 assign :: Parser Token
 assign = do
