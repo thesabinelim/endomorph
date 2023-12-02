@@ -21,6 +21,7 @@ import Endomorph.Lexer.Common (Parser)
 import Endomorph.Lexer.Identifier (identifier)
 import Endomorph.Lexer.Literal (literal)
 import Endomorph.Lexer.Operator (operator)
+import Endomorph.Lexer.Punctuation (punctuation)
 import Endomorph.Token (Token(EndOfInput))
 
 lex :: String -> Either (ParseErrorBundle String Void) [Token]
@@ -33,7 +34,8 @@ token :: Parser Token
 token = choice
   [ identifier
   , literal
-  , operator ]
+  , operator
+  , punctuation ]
 
 endOfInput :: Parser Token
 endOfInput = do

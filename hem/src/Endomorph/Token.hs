@@ -77,11 +77,13 @@ data Operator
   deriving Show
 
 data Punctuation
-  = Comma
+  = Colon
+  | Comma
   | LBrace
   | LBracket
   | LParens
   | RBrace
   | RBracket
   | RParens
+  | Semicolon
   deriving Show
