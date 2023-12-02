@@ -13,6 +13,7 @@ data Keyword
   = Else
   | Export
   | For
+  | From
   | If
   | Import
   | Let
