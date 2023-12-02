@@ -1,6 +1,4 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-
-module Token where
+module Endomorph.Token where
 
 data Token
   = EndOfInput

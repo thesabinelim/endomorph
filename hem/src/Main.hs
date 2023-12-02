@@ -1,14 +1,16 @@
 module Main where
 
+import Prelude hiding (lex)
+
 import Control.Monad.Trans (liftIO)
 import System.Console.Haskeline (defaultSettings, getInputLine, runInputT)
 import System.Exit (exitSuccess)
 import System.IO (hFlush, isEOF, stdout)
 
-import Lexer.Lexer (lex)
+import Endomorph.Lexer (lex)
 
 process :: String -> IO ()
-process line = case Lexer.Lexer.lex line of
+process line = case lex line of
   Left a -> print "Error"
   Right a -> print a
 

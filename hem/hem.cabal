@@ -16,8 +16,12 @@ executable hem
     hs-source-dirs:   src
     main-is:          Main.hs
     other-modules:
-        Lexer.Lexer
-        Token
+        Endomorph.Lexer
+        Endomorph.Lexer.Common
+        Endomorph.Lexer.Identifier
+        Endomorph.Lexer.Literal
+        Endomorph.Lexer.Operator
+        Endomorph.Token
     import:
         warnings
     build-depends:
