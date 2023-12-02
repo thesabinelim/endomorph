@@ -43,28 +43,42 @@ data Base
 
 data Operator
   = And
+  | AndAssign
   | Arrow
   | Assign
   | Divide
+  | DivideAssign
+  | Dot
   | Equality
   | Greater
   | GreaterEquals
   | Less
   | LessEquals
   | LShift
+  | LShiftAssign
   | Minus
+  | MinusAssign
   | Modulo
+  | ModuloAssign
   | Not
+  | NotEquals
   | Or
+  | OrAssign
   | Plus
+  | PlusAssign
   | Power
+  | PowerAssign
   | RShift
+  | RShiftAssign
   | Times
+  | TimesAssign
   | Xor
+  | XorAssign
   deriving Show
 
 data Punctuation
-  = LBrace
+  = Comma
+  | LBrace
   | LBracket
   | LParens
   | RBrace
