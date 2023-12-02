@@ -10,83 +10,79 @@ import Endomorph.Token (Token(Operator), Operator(..))
 
 operator :: Parser Token
 operator = choice
-  [ eqEq
-  , gtEq
-  , lshift
-  , ltEq
-  , pow
-  , rshift
+  [ equality
+  , greaterEquals
+  , lessEquals
+  , lShift
+  , power
+  , rShift
   , and
-  , div
-  , eq
-  , gt
-  , lt
-  , min
-  , mod
-  , mult
+  , assign
+  , divide
+  , equality
+  , greater
+  , less
+  , minus
+  , modulo
   , not
   , or
-  , plus ]
+  , plus
+  , times ]
 
 and :: Parser Token
 and = do
   char '&'
   return $ Operator And
 
-div :: Parser Token
-div = do
-  char '/'
-  return $ Operator Div
-
-eqEq :: Parser Token
-eqEq = do
-  string "=="
-  return $ Operator EqEq
-
-eq :: Parser Token
-eq = do
+assign :: Parser Token
+assign = do
   char '='
-  return $ Operator Eq
+  return $ Operator Assign
 
-gt :: Parser Token
-gt = do
+divide :: Parser Token
+divide = do
+  char '/'
+  return $ Operator Divide
+
+equality :: Parser Token
+equality = do
+  string "=="
+  return $ Operator Equality
+
+greater :: Parser Token
+greater = do
   char '>'
-  return $ Operator Gt
+  return $ Operator Greater
 
-gtEq :: Parser Token
-gtEq = do
+greaterEquals :: Parser Token
+greaterEquals = do
   string ">="
-  return $ Operator GtEq
+  return $ Operator GreaterEquals
 
-lshift :: Parser Token
-lshift = do
-  string "<<"
-  return $ Operator Lshift
-
-lt :: Parser Token
-lt = do
+less :: Parser Token
+less = do
   char '<'
-  return $ Operator Lt
+  return $ Operator Less
 
-ltEq :: Parser Token
-ltEq = do
+lessEquals :: Parser Token
+lessEquals = do
   string "<="
-  return $ Operator LtEq
+  return $ Operator LessEquals
 
-min :: Parser Token
-min = do
+lShift :: Parser Token
+lShift = do
+  string "<<"
+  return $ Operator LShift
+
+minus :: Parser Token
+minus = do
   char '-'
-  return $ Operator Min
+  return $ Operator Minus
 
-mod :: Parser Token
-mod = do
+modulo :: Parser Token
+modulo = do
   char '%'
-  return $ Operator Mod
-
-mult :: Parser Token
-mult = do
-  char '*'
-  return $ Operator Mult
+  return $ Operator Modulo
 
 not :: Parser Token
 not = do
@@ -103,15 +99,20 @@ plus = do
   char '+'
   return $ Operator Plus
 
-pow :: Parser Token
-pow = do
+power :: Parser Token
+power = do
   string "**"
-  return $ Operator Pow
+  return $ Operator Power
 
-rshift :: Parser Token
-rshift = do
+rShift :: Parser Token
+rShift = do
   string ">>"
-  return $ Operator Rshift
+  return $ Operator RShift
+
+times :: Parser Token
+times = do
+  char '*'
+  return $ Operator Times
 
 xor :: Parser Token
 xor = do

@@ -3,8 +3,20 @@ module Endomorph.Token where
 data Token
   = EndOfInput
   | Identifier String
+  | Keyword Keyword
   | Literal Literal
   | Operator Operator
+  | Punctuation Punctuation
+  deriving Show
+
+data Keyword
+  = Else
+  | Export
+  | For
+  | If
+  | Import
+  | Let
+  | Mut
   deriving Show
 
 data Literal
@@ -31,21 +43,31 @@ data Base
 
 data Operator
   = And
-  | Div
-  | Eq
-  | EqEq
-  | Gt
-  | GtEq
-  | Lshift
-  | Lt
-  | LtEq
-  | Min
-  | Mod
+  | Arrow
+  | Assign
+  | Divide
+  | Equality
+  | Greater
+  | GreaterEquals
+  | Less
+  | LessEquals
+  | LShift
+  | Minus
+  | Modulo
   | Not
   | Or
-  | Xor
   | Plus
-  | Pow
-  | Rshift
-  | Mult
+  | Power
+  | RShift
+  | Times
+  | Xor
+  deriving Show
+
+data Punctuation
+  = LBrace
+  | LBracket
+  | LParens
+  | RBrace
+  | RBracket
+  | RParens
   deriving Show
