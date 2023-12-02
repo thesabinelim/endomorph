@@ -3,8 +3,7 @@ module Endomorph.Lexer where
 import Data.Char (isSpace)
 import Data.Void (Void)
 import Text.Megaparsec
-  ( between
-  , choice
+  ( choice
   , eof
   , many
   , Parsec
