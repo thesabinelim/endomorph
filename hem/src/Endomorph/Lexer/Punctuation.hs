@@ -1,7 +1,5 @@
 module Endomorph.Lexer.Punctuation where
 
-import Prelude hiding (and, div, min, mod, not, or)
-
 import Text.Megaparsec (choice)
 import Text.Megaparsec.Char (char, string)
 
