@@ -68,6 +68,7 @@ data Operator
   | PlusAssign
   | Power
   | PowerAssign
+  | Question
   | RShift
   | RShiftAssign
   | Times

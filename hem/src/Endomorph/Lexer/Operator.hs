@@ -173,6 +173,11 @@ powerAssign = do
   string "**="
   return $ Operator PowerAssign
 
+question :: Parser Token
+question = do
+  char '?'
+  return $ Operator Question
+
 rShift :: Parser Token
 rShift = do
   string ">>"
