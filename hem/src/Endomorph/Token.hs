@@ -8,7 +8,7 @@ data Token
   | Operator Operator
   | Punctuation Punctuation
   | Whitespace String
-  deriving Show
+  deriving (Show)
 
 data Keyword
   = Else
@@ -19,7 +19,7 @@ data Keyword
   | Import
   | Let
   | Mut
-  deriving Show
+  deriving (Show)
 
 data Literal
   = Boolean Boolean
@@ -27,21 +27,22 @@ data Literal
   | Integer IntegerLiteral
   | Float
   | String
-  deriving Show
+  deriving (Show)
 
-data Boolean = True | False deriving Show
+data Boolean = True | False deriving (Show)
 
 data IntegerLiteral = IntegerLiteral
-  { base :: Base
-  , value :: String }
-  deriving Show
+  { base :: Base,
+    value :: String
+  }
+  deriving (Show)
 
 data Base
   = Binary
   | Decimal
   | Hexadecimal
   | Octal
-  deriving Show
+  deriving (Show)
 
 data Operator
   = And
@@ -77,7 +78,7 @@ data Operator
   | TimesAssign
   | Xor
   | XorAssign
-  deriving Show
+  deriving (Show)
 
 data Punctuation
   = Colon
@@ -89,4 +90,4 @@ data Punctuation
   | RBracket
   | RParens
   | Semicolon
-  deriving Show
+  deriving (Show)

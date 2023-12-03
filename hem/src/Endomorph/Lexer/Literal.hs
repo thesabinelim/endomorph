@@ -1,10 +1,9 @@
 module Endomorph.Lexer.Literal where
 
 import Data.Char (isDigit, isHexDigit, isOctDigit)
-import Text.Megaparsec (takeWhile1P)
-
 import Endomorph.Lexer.Common (Parser)
 import Endomorph.Token (Token)
+import Text.Megaparsec (takeWhile1P)
 
 literal :: Parser Token
 literal = fail "unimplemented"
@@ -18,10 +17,10 @@ literal = fail "unimplemented"
 --   prefixZero <- optional $ char '0'
 --   case prefixZero of
 --     Nothing -> do
---       return 
+--       return
 --     Just '0' -> do
---       optional $ 
---       return 
+--       optional $
+--       return
 
 --   binaryDigits <- binaryDigits
 --   decimalDigits <- decimalDigits
