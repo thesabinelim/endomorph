@@ -5,7 +5,6 @@ import Endomorph.Lexer.Util (symbolChoice)
 import Endomorph.Token (Operator (..), Token (Operator))
 import Text.Megaparsec (choice)
 import Text.Megaparsec.Char (char, string)
-import Prelude hiding (and, div, min, mod, not, or)
 
 operator :: Parser Token
 operator =
