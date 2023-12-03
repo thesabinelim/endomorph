@@ -7,7 +7,7 @@ data Token
   | Keyword Keyword
   | Literal Literal
   | Operator Operator
-  | Punctuation Punctuation
+  | Punctuator Punctuator
   | Whitespace String
   deriving (Show)
 
@@ -81,7 +81,7 @@ data Operator
   | XorAssign
   deriving (Show)
 
-data Punctuation
+data Punctuator
   = Colon
   | Comma
   | LBrace

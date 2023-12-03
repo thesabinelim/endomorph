@@ -6,7 +6,7 @@ import Endomorph.Lexer.Common (Parser)
 import Endomorph.Lexer.Identifier (identifier)
 import Endomorph.Lexer.Literal (literal)
 import Endomorph.Lexer.Operator (operator)
-import Endomorph.Lexer.Punctuation (punctuation)
+import Endomorph.Lexer.Punctuator (punctuator)
 import Endomorph.Lexer.Util (isLineBreakChar)
 import Endomorph.Token (Token (Comment, EndOfInput, Whitespace))
 import Text.Megaparsec
@@ -34,7 +34,7 @@ token =
       identifier,
       literal,
       operator,
-      punctuation,
+      punctuator,
       whitespace
     ]
 
