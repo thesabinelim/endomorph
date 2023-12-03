@@ -29,6 +29,7 @@ executable hem
     build-depends:
         base            >=4.17.2.0,
         haskeline       >=0.8.2.1,
+        hlint           >=3.6.1,
         megaparsec      >=9.6.1,
         mtl             >=2.3.1,
-        ormolu          >=0.7.3.0
+        ormolu          ==0.7.2.0
