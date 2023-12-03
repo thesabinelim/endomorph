@@ -1,7 +1,8 @@
 module Endomorph.Token where
 
 data Token
-  = EndOfInput
+  = Comment String
+  | EndOfInput
   | Identifier String
   | Keyword Keyword
   | Literal Literal

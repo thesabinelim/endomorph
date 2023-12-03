@@ -7,7 +7,8 @@ import Endomorph.Lexer.Identifier (identifier)
 import Endomorph.Lexer.Literal (literal)
 import Endomorph.Lexer.Operator (operator)
 import Endomorph.Lexer.Punctuation (punctuation)
-import Endomorph.Token (Token (EndOfInput, Whitespace))
+import Endomorph.Lexer.Util (isLineBreakChar)
+import Endomorph.Token (Token (Comment, EndOfInput, Whitespace))
 import Text.Megaparsec
   ( ParseErrorBundle,
     Parsec,
@@ -16,8 +17,9 @@ import Text.Megaparsec
     many,
     runParser,
     takeWhile1P,
+    takeWhileP,
   )
-import Text.Megaparsec.Char (space1)
+import Text.Megaparsec.Char (char, space1)
 
 lex :: String -> Either (ParseErrorBundle String Void) [Token]
 lex = runParser (tokens <* endOfInput) "stdin"
@@ -28,7 +30,8 @@ tokens = many token
 token :: Parser Token
 token =
   choice
-    [ identifier,
+    [ comment,
+      identifier,
       literal,
       operator,
       punctuation,
@@ -39,6 +42,12 @@ endOfInput :: Parser Token
 endOfInput = do
   eof
   return EndOfInput
+
+comment :: Parser Token
+comment = do
+  char '#'
+  text <- takeWhileP (Just "text") $ not . isLineBreakChar
+  return $ Comment text
 
 whitespace :: Parser Token
 whitespace = do
