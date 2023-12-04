@@ -15,6 +15,5 @@ punctuator =
       ("(", Punctuator LParens),
       ("}", Punctuator RBrace),
       ("]", Punctuator RBracket),
-      (")", Punctuator RParens),
-      (";", Punctuator Semicolon)
+      (")", Punctuator RParens)
     ]

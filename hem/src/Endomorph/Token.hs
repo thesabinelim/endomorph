@@ -90,5 +90,4 @@ data Punctuator
   | RBrace
   | RBracket
   | RParens
-  | Semicolon
   deriving (Show)
