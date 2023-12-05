@@ -9,22 +9,22 @@ A multiline comment
 
 type ATuple = (Int, Int)
 
-type AnArray = Int[]
+type AnArray = [Int]
 
 type ARecord = {
-  x: int,
-  y: int
+    x: int,
+    y: int
 }
 
-type AGeneric<T> = {
-  example: T[]
+type AGeneric TypeArg = {
+    example: [TypeArg]
 }
 
-type NestedGeneric<T> = {
-  example: AGeneric<T>[]
+type NestedGeneric TypeArg = {
+    example: [AGeneric TypeArg]
 }
 
-type NestedGeneric2 = NestedGeneric<AGeneric<T>>
+type NestedGeneric2 TypeArg = NestedGeneric AGeneric TypeArg
 
 aString = "test"
 
@@ -40,4 +40,4 @@ export add: AddFn = x -> y -> x + y
 export sub = x: Int -> y: Int -> x - y
 
 export main = () ->
-  print add 1 sub 3 1
+    print add 1 sub 3 1
