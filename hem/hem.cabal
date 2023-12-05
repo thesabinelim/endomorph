@@ -17,6 +17,7 @@ executable hem
     main-is:          Main.hs
     other-modules:
         Endomorph.Lexer
+        Endomorph.Lexer.Comment
         Endomorph.Lexer.Common
         Endomorph.Lexer.Identifier
         Endomorph.Lexer.Literal
