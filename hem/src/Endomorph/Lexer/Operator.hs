@@ -12,6 +12,7 @@ operator =
     [ ("<<=", Operator LShiftAssign),
       ("**=", Operator PowerAssign),
       (">>=", Operator RShiftAssign),
+      ("...", Operator Spread),
       ("&=", Operator AndAssign),
       ("->", Operator Arrow),
       ("/=", Operator DivideAssign),

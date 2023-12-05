@@ -75,6 +75,7 @@ data Operator
   | Question
   | RShift
   | RShiftAssign
+  | Spread
   | Times
   | TimesAssign
   | Xor
