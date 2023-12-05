@@ -29,8 +29,8 @@ type NestedGeneric2 TypeArg = NestedGeneric AGeneric TypeArg
 aString = "test"
 
 aMultilineString = "
-hello
-world
+    hello
+    world
 "
 
 type AddFn = Int -> Int -> Int
