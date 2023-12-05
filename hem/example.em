@@ -16,15 +16,15 @@ type ARecord = {
     y: int
 }
 
-type AGeneric TypeArg = {
-    example: [TypeArg]
+type AGeneric<TypeArg> = {
+    example: TypeArg[]
 }
 
-type NestedGeneric TypeArg = {
-    example: [AGeneric TypeArg]
+type NestedGeneric<TypeArg> = {
+    example: AGeneric<TypeArg>[]
 }
 
-type NestedGeneric2 TypeArg = NestedGeneric AGeneric TypeArg
+type NestedGeneric2<TypeArg> = NestedGeneric<AGeneric<TypeArg>>
 
 aString = "test"
 
