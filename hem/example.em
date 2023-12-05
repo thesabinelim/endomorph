@@ -40,4 +40,4 @@ export add: AddFn = x -> y -> x + y
 export sub = x: Int -> y: Int -> x - y
 
 export main = () ->
-    print add 1 sub 3 1
+    print(add(1, sub(3, 1)))
