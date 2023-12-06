@@ -1,10 +1,16 @@
 mod data;
+mod io;
 mod lex;
+mod util;
 
-use std::io::{self, Write};
-
-use crate::lex::lex::lex;
-use data::{source_info::SourceError, token::TokenData};
+use data::{
+    source::{Source, SourceError},
+    token::TokenData,
+};
+use io::io::prompt_line;
+use lex::lex::lex;
+use util::source::offset_to_position;
+use util::text::remove_line_break;
 
 const NAME: &str = env!("CARGO_PKG_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -17,9 +23,13 @@ fn main() {
 }
 
 fn process_text(text: String) {
-    match lex("stdin".to_string(), text) {
+    let source = Source {
+        file: "stdin".to_string(),
+        text,
+    };
+    match lex(&source) {
         Ok(tokens) => print_tokens(tokens),
-        Err(error) => print_error(error),
+        Err(error) => print_error(&source, error),
     }
 }
 
@@ -43,39 +53,13 @@ fn print_tokens(tokens: Vec<TokenData>) {
     );
 }
 
-fn print_error(error: SourceError) {
+fn print_error(source: &Source, error: SourceError) {
+    let position = offset_to_position(&source, error.offset);
     println!(
         "{}:{}:{} {}",
-        error.location.file,
-        error.location.line_offset + 1,
-        error.location.col_offset + 1,
+        source.file,
+        position.line + 1,
+        position.col + 1,
         error.message
     );
-}
-
-fn prompt_line() -> Result<Option<String>, io::Error> {
-    print!("> ");
-    io::stdout().flush()?;
-    read_line()
-}
-
-fn read_line() -> Result<Option<String>, io::Error> {
-    let mut line = String::new();
-    let len = io::stdin().read_line(&mut line)?;
-    if len > 0 {
-        Ok(Some(line))
-    } else {
-        Ok(None)
-    }
-}
-
-fn remove_line_break(line: String) -> String {
-    let mut line = line;
-    if line.ends_with('\n') {
-        line.pop();
-    }
-    if line.ends_with('\r') {
-        line.pop();
-    }
-    line
 }

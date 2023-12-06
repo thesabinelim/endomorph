@@ -1,8 +1,9 @@
-use super::source_info::SourceLocation;
+use super::source::SourcePosition;
 
 pub struct TokenData {
-    pub location: SourceLocation,
     pub token: Token,
+    pub start: SourcePosition,
+    pub end: SourcePosition,
 }
 
 pub enum Token {

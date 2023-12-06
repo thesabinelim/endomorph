@@ -1,13 +1,21 @@
-use crate::data::source_info::{SourceError, SourceLocation};
-use crate::data::token::TokenData;
+use crate::data::{
+    source::{Source, SourceError},
+    token::TokenData,
+};
 
-pub fn lex(file: String, _text: String) -> Result<Vec<TokenData>, SourceError> {
+use super::data::{PartialLexInput, PartialLexResult};
+
+pub fn lex(input: &Source) -> Result<Vec<TokenData>, SourceError> {
+    let success = token(PartialLexInput {
+        offset: 0,
+        remaining: input.text.clone(),
+    })?;
+    Ok(vec![success.token])
+}
+
+fn token(input: PartialLexInput) -> PartialLexResult {
     Err(SourceError {
-        location: SourceLocation {
-            file: file,
-            line_offset: 0,
-            col_offset: 0,
-        },
+        offset: input.offset,
         message: "Lexer unimplemented".to_string(),
     })
 }
