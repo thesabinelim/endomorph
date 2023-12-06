@@ -6,6 +6,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 fn main() {
     println!("{} {}", NAME, VERSION);
     while let Ok(Some(line)) = prompt() {
+        let line = remove_line_break(line);
         println!("{}", line);
     }
 }
@@ -24,4 +25,15 @@ fn read_line() -> Result<Option<String>, io::Error> {
     } else {
         Ok(None)
     }
+}
+
+fn remove_line_break(line: String) -> String {
+    let mut line = line;
+    if line.ends_with('\n') {
+        line.pop();
+    }
+    if line.ends_with('\r') {
+        line.pop();
+    }
+    line
 }
