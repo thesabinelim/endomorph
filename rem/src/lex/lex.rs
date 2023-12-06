@@ -1,9 +1,8 @@
+use super::types::{PartialLexInput, PartialLexResult};
 use crate::types::{
     source::{Source, SourceError},
     token::TokenData,
 };
-
-use super::types::{PartialLexInput, PartialLexResult};
 
 pub fn lex(input: &Source) -> Result<Vec<TokenData>, SourceError> {
     let success = token(PartialLexInput {
