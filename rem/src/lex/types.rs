@@ -1,4 +1,4 @@
-use crate::data::{source::SourceError, token::TokenData};
+use crate::types::{source::SourceError, token::TokenData};
 
 pub struct PartialLexInput {
     pub offset: usize,

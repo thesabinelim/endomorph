@@ -1,3 +1,3 @@
-mod data;
 pub mod lex;
 mod token;
+mod types;

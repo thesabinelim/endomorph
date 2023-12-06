@@ -1,14 +1,14 @@
-mod data;
 mod io;
 mod lex;
+mod types;
 mod util;
 
-use data::{
-    source::{Source, SourceError},
-    token::TokenData,
-};
 use io::io::prompt_line;
 use lex::lex::lex;
+use types::{
+    source::{Source, SourceError},
+    token::{Token, TokenData},
+};
 use util::source::offset_to_position;
 use util::text::remove_line_break;
 
@@ -39,14 +39,14 @@ fn print_tokens(tokens: Vec<TokenData>) {
         tokens
             .iter()
             .map(|token| match token.token {
-                data::token::Token::Comment(_) => "Comment",
-                data::token::Token::EndOfInput => "EndOfInput",
-                data::token::Token::Identifier(_) => "Identifier",
-                data::token::Token::Keyword(_) => "Keyword",
-                data::token::Token::Literal(_) => "Literal",
-                data::token::Token::Operator(_) => "Operator",
-                data::token::Token::Punctuator(_) => "Punctuator",
-                data::token::Token::Whitespace(_) => "Whitespace",
+                Token::Comment(_) => "Comment",
+                Token::EndOfInput => "EndOfInput",
+                Token::Identifier(_) => "Identifier",
+                Token::Keyword(_) => "Keyword",
+                Token::Literal(_) => "Literal",
+                Token::Operator(_) => "Operator",
+                Token::Punctuator(_) => "Punctuator",
+                Token::Whitespace(_) => "Whitespace",
             })
             .collect::<Vec<&str>>()
             .join(", ")

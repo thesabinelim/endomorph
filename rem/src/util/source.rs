@@ -1,4 +1,4 @@
-use crate::data::source::{Source, SourcePosition};
+use crate::types::source::{Source, SourcePosition};
 
 pub fn offset_to_position(source: &Source, offset: usize) -> SourcePosition {
     let chars = source.text.chars().collect::<Vec<char>>();
