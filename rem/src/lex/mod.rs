@@ -7,10 +7,10 @@ use crate::types::{
     token::TokenData,
 };
 
-pub fn lex(input: &Source) -> Result<Vec<TokenData>, SourceError> {
+pub fn lex(source: &Source) -> Result<Vec<TokenData>, SourceError> {
     let success = token(PartialLexInput {
         offset: 0,
-        remaining: input.text.clone(),
+        remaining: source.text.clone(),
     })?;
     Ok(vec![success.token])
 }
