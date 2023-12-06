@@ -1,3 +1,5 @@
+mod data;
+
 use std::io::{self, Write};
 
 const NAME: &str = env!("CARGO_PKG_NAME");

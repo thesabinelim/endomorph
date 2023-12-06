@@ -1,3 +1,10 @@
+use super::source_info::SourceLocation;
+
+pub struct TokenData {
+    location: SourceLocation,
+    token: Token,
+}
+
 pub enum Token {
     Comment(Comment),
     EndOfInput,
