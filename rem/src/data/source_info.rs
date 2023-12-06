@@ -1,10 +1,10 @@
 pub struct SourceError {
-    location: SourceLocation,
-    message: String,
+    pub location: SourceLocation,
+    pub message: String,
 }
 
 pub struct SourceLocation {
-    file: String,
-    line_offset: usize,
-    col_offset: usize,
+    pub file: String,
+    pub line_offset: usize,
+    pub col_offset: usize,
 }

@@ -1,8 +1,8 @@
 use super::source_info::SourceLocation;
 
 pub struct TokenData {
-    location: SourceLocation,
-    token: Token,
+    pub location: SourceLocation,
+    pub token: Token,
 }
 
 pub enum Token {
@@ -17,11 +17,11 @@ pub enum Token {
 }
 
 pub struct Comment {
-    text: String,
+    pub text: String,
 }
 
 pub struct Identifier {
-    name: String,
+    pub name: String,
 }
 
 pub enum Keyword {
@@ -93,5 +93,5 @@ pub enum Punctuator {
 }
 
 pub struct Whitespace {
-    text: String,
+    pub text: String,
 }
