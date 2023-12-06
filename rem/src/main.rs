@@ -29,16 +29,16 @@ fn print_tokens(tokens: Vec<TokenData>) {
         tokens
             .iter()
             .map(|token| match token.token {
-                data::token::Token::Comment(_) => "Comment".to_string(),
-                data::token::Token::EndOfInput => "EndOfInput".to_string(),
-                data::token::Token::Identifier(_) => "Identifier".to_string(),
-                data::token::Token::Keyword(_) => "Keyword".to_string(),
-                data::token::Token::Literal(_) => "Literal".to_string(),
-                data::token::Token::Operator(_) => "Operator".to_string(),
-                data::token::Token::Punctuator(_) => "Punctuator".to_string(),
-                data::token::Token::Whitespace(_) => "Whitespace".to_string(),
+                data::token::Token::Comment(_) => "Comment",
+                data::token::Token::EndOfInput => "EndOfInput",
+                data::token::Token::Identifier(_) => "Identifier",
+                data::token::Token::Keyword(_) => "Keyword",
+                data::token::Token::Literal(_) => "Literal",
+                data::token::Token::Operator(_) => "Operator",
+                data::token::Token::Punctuator(_) => "Punctuator",
+                data::token::Token::Whitespace(_) => "Whitespace",
             })
-            .collect::<Vec<String>>()
+            .collect::<Vec<&str>>()
             .join(", ")
     );
 }
