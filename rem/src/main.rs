@@ -5,13 +5,13 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
     println!("{} {}", NAME, VERSION);
-    while let Ok(Some(line)) = prompt() {
+    while let Ok(Some(line)) = prompt_line() {
         let line = remove_line_break(line);
         println!("{}", line);
     }
 }
 
-fn prompt() -> Result<Option<String>, io::Error> {
+fn prompt_line() -> Result<Option<String>, io::Error> {
     print!("> ");
     io::stdout().flush()?;
     read_line()
