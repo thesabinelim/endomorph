@@ -4,7 +4,7 @@ mod types;
 mod util;
 
 use io::io::prompt_line;
-use lex::lex::lex;
+use lex::lex;
 use types::{
     source::{Source, SourceError},
     token::{Token, TokenData},
