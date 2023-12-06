@@ -7,7 +7,7 @@ fn main() {
     println!("{} {}", NAME, VERSION);
     while let Ok(Some(line)) = prompt_line() {
         let line = remove_line_break(line);
-        println!("{}", line);
+        process(line);
     }
 }
 
@@ -36,4 +36,8 @@ fn remove_line_break(line: String) -> String {
         line.pop();
     }
     line
+}
+
+fn process(line: String) {
+    println!("{}", line);
 }
