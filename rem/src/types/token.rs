@@ -1,12 +1,13 @@
 use super::source::SourcePosition;
 
-pub struct TokenData {
-    pub token: Token,
+pub struct Token {
+    pub kind: TokenKind,
     pub start: SourcePosition,
     pub end: SourcePosition,
 }
 
-pub enum Token {
+#[derive(Clone)]
+pub enum TokenKind {
     Comment(Comment),
     EndOfInput,
     Identifier(Identifier),

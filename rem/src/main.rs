@@ -7,7 +7,7 @@ use io::io::prompt_line;
 use lex::lex;
 use types::{
     source::{Source, SourceError},
-    token::{Token, TokenData},
+    token::{Token, TokenKind},
 };
 use util::source::offset_to_position;
 use util::text::remove_line_break;
@@ -33,20 +33,20 @@ fn process_text(text: String) {
     }
 }
 
-fn print_tokens(tokens: Vec<TokenData>) {
+fn print_tokens(tokens: Vec<Token>) {
     println!(
         "[{}]",
         tokens
             .iter()
-            .map(|token| match token.token {
-                Token::Comment(_) => "Comment",
-                Token::EndOfInput => "EndOfInput",
-                Token::Identifier(_) => "Identifier",
-                Token::Keyword(_) => "Keyword",
-                Token::Literal(_) => "Literal",
-                Token::Operator(_) => "Operator",
-                Token::Punctuator(_) => "Punctuator",
-                Token::Whitespace(_) => "Whitespace",
+            .map(|token| match token.kind {
+                TokenKind::Comment(_) => "Comment",
+                TokenKind::EndOfInput => "EndOfInput",
+                TokenKind::Identifier(_) => "Identifier",
+                TokenKind::Keyword(_) => "Keyword",
+                TokenKind::Literal(_) => "Literal",
+                TokenKind::Operator(_) => "Operator",
+                TokenKind::Punctuator(_) => "Punctuator",
+                TokenKind::Whitespace(_) => "Whitespace",
             })
             .collect::<Vec<&str>>()
             .join(", ")
