@@ -6,7 +6,6 @@ pub struct Token {
     pub end: SourcePosition,
 }
 
-#[derive(Clone)]
 pub enum TokenKind {
     Comment(Comment),
     EndOfInput,

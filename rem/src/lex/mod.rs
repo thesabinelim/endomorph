@@ -1,5 +1,3 @@
-mod token;
-
 use crate::types::{
     source::{Source, SourceError},
     token::Token,
