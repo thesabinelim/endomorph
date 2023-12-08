@@ -4,7 +4,7 @@ mod parser_combinators;
 mod types;
 mod util;
 
-use io::io::prompt_line;
+use io::prompt_line;
 use lex::lex;
 use types::{
     source::{Source, SourceError},
