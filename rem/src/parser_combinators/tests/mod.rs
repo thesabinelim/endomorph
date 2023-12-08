@@ -3,6 +3,19 @@ use std::collections::VecDeque;
 
 mod parser;
 
+#[macro_export]
+macro_rules! test_tokens {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            Box::new(crate::parser_combinators::tests::TestTokenStream::new(temp_vec))
+        }
+    };
+}
+
 pub struct TestTokenStream {
     pub n_advances: usize,
 
@@ -10,11 +23,11 @@ pub struct TestTokenStream {
 }
 
 impl TestTokenStream {
-    fn new(tokens: Vec<TestToken>) -> Box<TestTokenStream> {
-        Box::new(TestTokenStream {
+    fn new(tokens: Vec<TestToken>) -> TestTokenStream {
+        TestTokenStream {
             n_advances: 0,
             stream: VecDeque::from(tokens),
-        })
+        }
     }
 }
 
