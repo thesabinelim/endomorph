@@ -1,9 +1,25 @@
-use crate::parser_combinators::parser::single;
+use crate::parser_combinators::parser::{eof, single};
 
 use super::{TestToken, TestTokenStream};
 
+fn run_eof(tokens: Vec<TestToken>) -> Result<(), ()> {
+    eof(TestTokenStream::new(tokens))
+}
+
+#[test]
+fn describe_eof_it_works() {
+    let result = run_eof(vec![]);
+    assert!(result.is_ok())
+}
+
+#[test]
+fn describe_eof_it_errors_on_not_eof() {
+    let result = run_eof(vec![TestToken::A]);
+    assert!(result.is_err())
+}
+
 fn run_single(expected: TestToken, tokens: Vec<TestToken>) -> Result<TestToken, ()> {
-    single(expected)(Box::new(TestTokenStream::new(tokens)))
+    single(expected)(TestTokenStream::new(tokens))
 }
 
 #[test]

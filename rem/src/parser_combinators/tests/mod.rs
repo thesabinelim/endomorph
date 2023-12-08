@@ -1,18 +1,7 @@
+use super::TokenStream;
 use std::collections::VecDeque;
 
-use super::TokenStream;
-
 mod parser;
-
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum TestToken {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-}
 
 pub struct TestTokenStream {
     pub n_advances: usize,
@@ -21,11 +10,11 @@ pub struct TestTokenStream {
 }
 
 impl TestTokenStream {
-    fn new(tokens: Vec<TestToken>) -> TestTokenStream {
-        TestTokenStream {
+    fn new(tokens: Vec<TestToken>) -> Box<TestTokenStream> {
+        Box::new(TestTokenStream {
             n_advances: 0,
             stream: VecDeque::from(tokens),
-        }
+        })
     }
 }
 
@@ -43,4 +32,14 @@ impl TokenStream<TestToken> for TestTokenStream {
             None => Err(()),
         }
     }
+}
+
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub enum TestToken {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
 }
