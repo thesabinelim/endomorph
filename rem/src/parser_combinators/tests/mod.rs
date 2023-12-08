@@ -14,14 +14,14 @@ pub enum TestToken {
     F,
 }
 
-pub struct TestTokenStream<Token> {
+pub struct TestTokenStream {
     pub n_advances: usize,
 
-    stream: VecDeque<Token>,
+    stream: VecDeque<TestToken>,
 }
 
-impl<Token> TestTokenStream<Token> {
-    fn new(tokens: Vec<Token>) -> TestTokenStream<Token> {
+impl TestTokenStream {
+    fn new(tokens: Vec<TestToken>) -> TestTokenStream {
         TestTokenStream {
             n_advances: 0,
             stream: VecDeque::from(tokens),
@@ -29,7 +29,7 @@ impl<Token> TestTokenStream<Token> {
     }
 }
 
-impl<Token: Copy> TokenStream<Token> for TestTokenStream<Token> {
+impl TokenStream<TestToken> for TestTokenStream {
     fn advance(&mut self) -> Result<(), ()> {
         match self.stream.pop_front() {
             Some(_) => Ok(()),
@@ -37,7 +37,7 @@ impl<Token: Copy> TokenStream<Token> for TestTokenStream<Token> {
         }
     }
 
-    fn peek(&mut self) -> Result<Token, ()> {
+    fn peek(&mut self) -> Result<TestToken, ()> {
         match self.stream.front() {
             Some(token) => Ok(*token),
             None => Err(()),
