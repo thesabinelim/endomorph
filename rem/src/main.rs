@@ -1,5 +1,6 @@
 mod io;
 mod lex;
+mod parser_combinators;
 mod types;
 mod util;
 
