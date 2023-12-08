@@ -27,10 +27,6 @@ impl TestTokenStream {
             stream: VecDeque::from(tokens),
         }
     }
-
-    fn newBox(tokens: Vec<TestToken>) -> Box<TestTokenStream> {
-        Box::new(TestTokenStream::new(tokens))
-    }
 }
 
 impl TokenStream<TestToken> for TestTokenStream {
