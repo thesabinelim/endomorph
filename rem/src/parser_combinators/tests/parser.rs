@@ -4,24 +4,21 @@ use super::{TestToken, TestTokenStream};
 
 #[test]
 fn describe_single_it_works() {
-    let parser = single(TestToken::A);
     let tokens = vec![TestToken::A];
-    let result = parser(Box::new(TestTokenStream::new(tokens)));
+    let result = single(TestToken::A)(TestTokenStream::newBox(tokens));
     assert!(result.is_ok_and(|produced| produced == TestToken::A));
 }
 
 #[test]
 fn describe_single_it_errors_on_mismatch() {
-    let parser = single(TestToken::A);
-    let tokens = vec![TestToken::B];
-    let result = parser(Box::new(TestTokenStream::new(tokens)));
+    let tokens = vec![TestToken::A];
+    let result = single(TestToken::B)(TestTokenStream::newBox(tokens));
     assert!(result.is_err());
 }
 
 #[test]
 fn describe_single_it_errors_on_eof() {
-    let parser = single(TestToken::A);
     let tokens = vec![];
-    let result = parser(Box::new(TestTokenStream::new(tokens)));
+    let result = single(TestToken::A)(TestTokenStream::newBox(tokens));
     assert!(result.is_err());
 }
