@@ -37,7 +37,7 @@ impl TokenStream<TestToken> for TestTokenStream {
         }
     }
 
-    fn peek(&mut self) -> Result<TestToken, ()> {
+    fn peek(&self) -> Result<TestToken, ()> {
         match self.stream.front() {
             Some(token) => Ok(*token),
             None => Err(()),

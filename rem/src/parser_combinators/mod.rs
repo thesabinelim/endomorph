@@ -4,7 +4,7 @@ mod tests;
 
 pub trait TokenStream<Token> {
     fn advance(&mut self) -> Result<(), ()>;
-    fn peek(&mut self) -> Result<Token, ()>;
+    fn peek(&self) -> Result<Token, ()>;
 }
 
 // For performance reasons, a parser directly modifies the token stream via the
