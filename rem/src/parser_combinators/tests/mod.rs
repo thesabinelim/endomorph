@@ -1,17 +1,16 @@
 use super::TokenStream;
 use std::collections::VecDeque;
-
 mod parser;
 
 #[macro_export]
 macro_rules! test_tokens {
     ( $( $x:expr ),* ) => {
         {
-            let mut temp_vec = Vec::new();
+            let mut temp_vec: Vec<crate::parser_combinators::tests::TestToken> = Vec::new();
             $(
                 temp_vec.push($x);
             )*
-            Box::new(crate::parser_combinators::tests::TestTokenStream::new(temp_vec))
+            &mut crate::parser_combinators::tests::TestTokenStream::new(temp_vec)
         }
     };
 }
