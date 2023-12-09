@@ -1,5 +1,6 @@
 use super::TokenStream;
 use std::collections::VecDeque;
+mod combinator;
 mod parser;
 
 #[macro_export]
