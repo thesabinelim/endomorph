@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use super::TokenStream;
 
 pub fn choice<Token, Production>(
@@ -11,5 +13,18 @@ pub fn choice<Token, Production>(
             }
         }
         Err(())
+    }
+}
+
+pub fn produce<Token, Production: Copy, Error, OriginalProduction: Any>(
+    value: Production,
+    parser: impl Fn(&mut dyn TokenStream<Token>) -> Result<OriginalProduction, Error>,
+) -> impl Fn(&mut dyn TokenStream<Token>) -> Result<Production, Error> {
+    move |stream| {
+        let result = parser(stream);
+        match result {
+            Ok(_) => Ok(value),
+            Err(error) => Err(error),
+        }
     }
 }
