@@ -7,7 +7,7 @@ pub fn eof<Token>(stream: &dyn TokenStream<Token>) -> Result<(), ()> {
     }
 }
 
-pub fn single<Token: Clone + Copy + Eq>(
+pub fn single<Token: Eq>(
     expected: Token,
 ) -> impl Fn(&mut dyn TokenStream<Token>) -> Result<Token, ()> {
     move |stream| {
