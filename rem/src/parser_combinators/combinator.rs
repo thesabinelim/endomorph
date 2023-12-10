@@ -28,3 +28,19 @@ pub fn produce<Token, Production: Copy, Error, OriginalProduction: Any>(
         }
     }
 }
+
+pub fn sequence<Token, Production, Error>(
+    parsers: Vec<impl Fn(&mut dyn TokenStream<Token>) -> Result<Production, Error>>,
+) -> impl Fn(&mut dyn TokenStream<Token>) -> Result<Vec<Production>, Error> {
+    move |stream| {
+        let mut productions = Vec::new();
+        for parser in &parsers {
+            let result = parser(stream);
+            match result {
+                Ok(production) => productions.push(production),
+                Err(error) => return Err(error),
+            }
+        }
+        Ok(productions)
+    }
+}
