@@ -1,14 +1,16 @@
-use super::Parser;
+use super::TokenStream;
 
-pub fn eof<Token>() -> Parser<Token, (), ()> {
-    Box::new(|stream| match stream.peek() {
+pub fn eof<Token>(stream: &dyn TokenStream<Token>) -> Result<(), ()> {
+    match stream.peek() {
         Ok(_) => Err(()),
         Err(_) => Ok(()),
-    })
+    }
 }
 
-pub fn single<Token: Eq + 'static>(expected: Token) -> Parser<Token, Token, ()> {
-    Box::new(move |stream| {
+pub fn single<Token: Clone + Copy + Eq>(
+    expected: Token,
+) -> impl Fn(&mut dyn TokenStream<Token>) -> Result<Token, ()> {
+    move |stream| {
         let actual = stream.peek()?;
         if actual == expected {
             stream.advance()?;
@@ -16,5 +18,5 @@ pub fn single<Token: Eq + 'static>(expected: Token) -> Parser<Token, Token, ()> 
         } else {
             Err(())
         }
-    })
+    }
 }
