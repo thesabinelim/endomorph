@@ -1,7 +1,6 @@
 use crate::{
     parser_combinators::{
         combinator::{choice, produce, sequence},
-        parser::single,
         tests::{error, succeed, TestToken},
     },
     test_tokens,
@@ -54,7 +53,7 @@ fn describe_sequence_it_works() {
 
 #[test]
 fn describe_sequence_it_errors_on_inner_parser_error() {
-    let inner_parsers = vec![error::<TestToken, (), ()>(())];
+    let inner_parsers = vec![succeed::<TestToken, TestToken, ()>(TestToken::A), error(())];
     let parser = sequence(inner_parsers);
     let stream = test_tokens![TestToken::A];
     assert!(parser(stream).is_err());
