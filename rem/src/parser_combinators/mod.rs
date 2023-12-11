@@ -8,6 +8,7 @@ pub trait TokenStream<Token> {
     fn peek(&self) -> Result<Token, ()>;
 }
 
+// Boxed only because rustc does't support `impl` in type aliases yet
 // For performance reasons, a parser directly modifies the token stream via the
 // trait methods on consumption rather than return a copy for the remainder
 pub type Parser<'parser, Consumes, Produces, Error> =
