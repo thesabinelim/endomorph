@@ -7,14 +7,14 @@ use super::TestToken;
 
 #[test]
 fn describe_eof_it_works() {
-    let parser = eof;
+    let parser = eof();
     let stream = test_tokens![];
     assert!(parser(stream).is_ok())
 }
 
 #[test]
 fn describe_eof_it_errors_on_not_eof() {
-    let parser = eof;
+    let parser = eof();
     let stream = test_tokens![TestToken::A];
     assert!(parser(stream).is_err())
 }

@@ -1,5 +1,5 @@
-use super::TokenStream;
-use std::collections::VecDeque;
+use super::{Parser, TokenStream};
+use std::{any::Any, collections::VecDeque};
 mod combinator;
 mod parser;
 
@@ -55,4 +55,24 @@ pub enum TestToken {
     D,
     E,
     F,
+}
+
+pub fn succeed<'parser, Consumes, Produces, Error>(
+    value: Produces,
+) -> Parser<'parser, Consumes, Produces, Error>
+where
+    Produces: 'parser + Copy,
+    Error: Any,
+{
+    Box::new(move |_| Ok(value))
+}
+
+pub fn error<'parser, Consumes, Produces, Error>(
+    error: Error,
+) -> Parser<'parser, Consumes, Produces, Error>
+where
+    Produces: Any,
+    Error: 'parser + Copy,
+{
+    Box::new(move |_| Err(error))
 }
