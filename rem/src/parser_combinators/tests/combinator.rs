@@ -8,7 +8,7 @@ use crate::{
 
 #[test]
 fn describe_choice_it_works() {
-    let inner_parsers = vec![error(()), succeed(TestToken::A)];
+    let inner_parsers = vec![error(()), succeed(TestToken::A), succeed(TestToken::B)];
     let parser = choice(inner_parsers);
     let stream = test_tokens![TestToken::A];
     assert!(parser(stream).is_ok_and(|production| production == TestToken::A));
