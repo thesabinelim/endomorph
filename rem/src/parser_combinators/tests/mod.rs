@@ -57,22 +57,14 @@ pub enum TestToken {
     F,
 }
 
-pub fn test_success<'parser, Consumes, Produces, Error>(
-    value: Produces,
-) -> Parser<'parser, Consumes, Produces, Error>
-where
-    Produces: 'parser + Copy,
-    Error: Any,
-{
-    Box::new(move |_| Ok(value))
-}
-
-pub fn test_error<'parser, Consumes, Produces, Error>(
-    error: Error,
-) -> Parser<'parser, Consumes, Produces, Error>
-where
-    Produces: Any,
-    Error: 'parser + Copy,
-{
-    Box::new(move |_| Err(error))
+pub fn test_token<'parser>(expected: TestToken) -> Parser<'parser, TestToken, TestToken, ()> {
+    Box::new(move |stream| {
+        let actual = stream.peek()?;
+        if actual == expected {
+            stream.advance()?;
+            Ok(actual)
+        } else {
+            Err(())
+        }
+    })
 }
