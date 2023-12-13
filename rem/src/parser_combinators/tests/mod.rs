@@ -1,19 +1,30 @@
 use super::{Parser, TokenStream};
-use std::{any::Any, collections::VecDeque};
+use std::collections::VecDeque;
 mod combinator;
 mod parser;
 
-#[macro_export]
-macro_rules! test_tokens {
-    ( $( $x:expr ),* ) => {
-        {
-            let mut temp_vec: Vec<crate::parser_combinators::tests::TestToken> = Vec::new();
-            $(
-                temp_vec.push($x);
-            )*
-            &mut crate::parser_combinators::tests::TestTokenStream::new(temp_vec)
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub enum TestToken {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+}
+
+impl TestToken {
+    fn from(name: char) -> TestToken {
+        match name {
+            'a' => TestToken::A,
+            'b' => TestToken::B,
+            'c' => TestToken::C,
+            'd' => TestToken::D,
+            'e' => TestToken::E,
+            'f' => TestToken::F,
+            _ => panic!("{}", format!("Unrecognised TestToken: {}", name)),
         }
-    };
+    }
 }
 
 pub struct TestTokenStream {
@@ -23,10 +34,14 @@ pub struct TestTokenStream {
 }
 
 impl TestTokenStream {
-    fn new(tokens: Vec<TestToken>) -> TestTokenStream {
+    fn from<StringT: AsRef<str>>(token_names: StringT) -> TestTokenStream {
+        let mut tokens = VecDeque::new();
+        for name in token_names.as_ref().chars() {
+            tokens.push_back(TestToken::from(name));
+        }
         TestTokenStream {
             n_advances: 0,
-            stream: VecDeque::from(tokens),
+            stream: tokens,
         }
     }
 }
@@ -45,16 +60,6 @@ impl TokenStream<TestToken> for TestTokenStream {
             None => Err(()),
         }
     }
-}
-
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum TestToken {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
 }
 
 pub fn test_token<'parser>(expected: TestToken) -> Parser<'parser, TestToken, TestToken, ()> {
