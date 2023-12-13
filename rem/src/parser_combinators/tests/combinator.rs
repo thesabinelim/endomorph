@@ -1,15 +1,11 @@
 use crate::parser_combinators::{
-    combinator::{choice, produce, sequence},
-    tests::{test_token, TestToken, TestTokenStream},
+    combinator::{choice, produce, sequence, some},
+    tests::{test_match, test_matches, TestToken, TestTokenStream},
 };
 
 #[test]
 fn describe_choice_it_works() {
-    let inner_parsers = vec![
-        test_token(TestToken::A),
-        test_token(TestToken::B),
-        test_token(TestToken::C),
-    ];
+    let inner_parsers = test_matches("abc");
     let parser = choice(inner_parsers);
     assert!(
         parser(&mut TestTokenStream::from("a")).is_ok_and(|production| production == TestToken::A)
@@ -24,18 +20,14 @@ fn describe_choice_it_works() {
 
 #[test]
 fn describe_choice_it_errors_on_all_inner_parser_error() {
-    let inner_parsers = vec![
-        test_token(TestToken::A),
-        test_token(TestToken::B),
-        test_token(TestToken::C),
-    ];
+    let inner_parsers = test_matches("abc");
     let parser = choice(inner_parsers);
     assert!(parser(&mut TestTokenStream::from("d")).is_err());
 }
 
 #[test]
 fn describe_produce_it_works() {
-    let inner_parser = test_token(TestToken::A);
+    let inner_parser = test_match('a');
     let parser = produce(TestToken::B, inner_parser);
     assert!(
         parser(&mut TestTokenStream::from("a")).is_ok_and(|production| production == TestToken::B)
@@ -44,18 +36,14 @@ fn describe_produce_it_works() {
 
 #[test]
 fn describe_produce_it_errors_on_inner_parser_error() {
-    let inner_parser = test_token(TestToken::A);
+    let inner_parser = test_match('a');
     let parser = produce(TestToken::A, inner_parser);
     assert!(parser(&mut TestTokenStream::from("b")).is_err());
 }
 
 #[test]
 fn describe_sequence_it_works() {
-    let inner_parsers = vec![
-        test_token(TestToken::A),
-        test_token(TestToken::B),
-        test_token(TestToken::C),
-    ];
+    let inner_parsers = test_matches("abc");
     let parser = sequence(inner_parsers);
     assert!(parser(&mut TestTokenStream::from("abc"))
         .is_ok_and(|productions| productions == vec![TestToken::A, TestToken::B, TestToken::C]));
@@ -63,7 +51,7 @@ fn describe_sequence_it_works() {
 
 #[test]
 fn describe_sequence_it_errors_on_inner_parser_error() {
-    let inner_parsers = vec![test_token(TestToken::A), test_token(TestToken::B)];
+    let inner_parsers = test_matches("ab");
     let parser = sequence(inner_parsers);
     assert!(parser(&mut TestTokenStream::from("aa")).is_err());
 }

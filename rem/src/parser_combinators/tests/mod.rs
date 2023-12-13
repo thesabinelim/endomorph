@@ -62,7 +62,8 @@ impl TokenStream<TestToken> for TestTokenStream {
     }
 }
 
-pub fn test_token<'parser>(expected: TestToken) -> Parser<'parser, TestToken, TestToken, ()> {
+pub fn test_match<'parser>(expected_token_name: char) -> Parser<'parser, TestToken, TestToken, ()> {
+    let expected = TestToken::from(expected_token_name);
     Box::new(move |stream| {
         let actual = stream.peek()?;
         if actual == expected {
@@ -72,4 +73,14 @@ pub fn test_token<'parser>(expected: TestToken) -> Parser<'parser, TestToken, Te
             Err(())
         }
     })
+}
+
+pub fn test_matches<'parser, StringT: AsRef<str>>(
+    expected_token_names: StringT,
+) -> Vec<Parser<'parser, TestToken, TestToken, ()>> {
+    expected_token_names
+        .as_ref()
+        .chars()
+        .map(|name| test_match(name))
+        .collect()
 }
