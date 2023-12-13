@@ -1,6 +1,6 @@
 use crate::{
     parser_combinators::{
-        combinator::{choice, produce, sequence},
+        combinator::{choice, produce, sequence, some},
         tests::{error, succeed, TestToken},
     },
     test_tokens,
@@ -10,32 +10,28 @@ use crate::{
 fn describe_choice_it_works() {
     let inner_parsers = vec![error(()), succeed(TestToken::A), succeed(TestToken::B)];
     let parser = choice(inner_parsers);
-    let stream = test_tokens![TestToken::A];
-    assert!(parser(stream).is_ok_and(|production| production == TestToken::A));
+    assert!(parser(test_tokens![]).is_ok_and(|production| production == TestToken::A));
 }
 
 #[test]
 fn describe_choice_it_errors_on_all_inner_parser_error() {
-    let inner_parsers = vec![error::<TestToken, (), ()>(())];
+    let inner_parsers = vec![error::<TestToken, TestToken, ()>(())];
     let parser = choice(inner_parsers);
-    let stream = test_tokens![TestToken::D];
-    assert!(parser(stream).is_err());
+    assert!(parser(test_tokens![]).is_err());
 }
 
 #[test]
 fn describe_produce_it_works() {
     let inner_parser = succeed::<TestToken, TestToken, ()>(TestToken::A);
     let parser = produce(TestToken::B, inner_parser);
-    let stream = test_tokens![TestToken::A];
-    assert!(parser(stream).is_ok_and(|production| production == TestToken::B));
+    assert!(parser(test_tokens![]).is_ok_and(|production| production == TestToken::B));
 }
 
 #[test]
 fn describe_produce_it_errors_on_inner_parser_error() {
-    let inner_parser = error::<TestToken, (), ()>(());
+    let inner_parser = error::<TestToken, TestToken, ()>(());
     let parser = produce(TestToken::A, inner_parser);
-    let stream = test_tokens![TestToken::A];
-    assert!(parser(stream).is_err());
+    assert!(parser(test_tokens![]).is_err());
 }
 
 #[test]
@@ -46,8 +42,7 @@ fn describe_sequence_it_works() {
         succeed(TestToken::C),
     ];
     let parser = sequence(inner_parsers);
-    let stream = test_tokens![TestToken::A, TestToken::A, TestToken::A];
-    assert!(parser(stream)
+    assert!(parser(test_tokens![])
         .is_ok_and(|productions| productions == vec![TestToken::A, TestToken::B, TestToken::C]));
 }
 
@@ -55,6 +50,5 @@ fn describe_sequence_it_works() {
 fn describe_sequence_it_errors_on_inner_parser_error() {
     let inner_parsers = vec![succeed::<TestToken, TestToken, ()>(TestToken::A), error(())];
     let parser = sequence(inner_parsers);
-    let stream = test_tokens![TestToken::A];
-    assert!(parser(stream).is_err());
+    assert!(parser(test_tokens![]).is_err());
 }
