@@ -30,7 +30,7 @@ fn describe_choice_it_errors_on_all_inner_parser_error() {
         test_token(TestToken::C),
     ];
     let parser = choice(inner_parsers);
-    assert!(parser(&mut TestTokenStream::from("a")).is_err());
+    assert!(parser(&mut TestTokenStream::from("d")).is_err());
 }
 
 #[test]
