@@ -57,7 +57,7 @@ pub enum TestToken {
     F,
 }
 
-pub fn succeed<'parser, Consumes, Produces, Error>(
+pub fn test_success<'parser, Consumes, Produces, Error>(
     value: Produces,
 ) -> Parser<'parser, Consumes, Produces, Error>
 where
@@ -67,7 +67,7 @@ where
     Box::new(move |_| Ok(value))
 }
 
-pub fn error<'parser, Consumes, Produces, Error>(
+pub fn test_error<'parser, Consumes, Produces, Error>(
     error: Error,
 ) -> Parser<'parser, Consumes, Produces, Error>
 where
