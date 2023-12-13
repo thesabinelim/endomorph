@@ -26,6 +26,29 @@ fn describe_choice_it_errors_on_all_inner_parser_error() {
 }
 
 #[test]
+fn describe_some_it_works_with_no_matches() {
+    let inner_parser = test_match('a');
+    let parser = some(inner_parser);
+    assert!(parser(&mut TestTokenStream::from("b")).is_ok_and(|productions| productions == vec![]));
+}
+
+#[test]
+fn describe_some_it_works_with_one_match() {
+    let inner_parser = test_match('a');
+    let parser = some(inner_parser);
+    assert!(parser(&mut TestTokenStream::from("aba"))
+        .is_ok_and(|productions| productions == vec![TestToken::A]));
+}
+
+#[test]
+fn describe_some_it_works_with_several_matches() {
+    let inner_parser = test_match('a');
+    let parser = some(inner_parser);
+    assert!(parser(&mut TestTokenStream::from("aaaba"))
+        .is_ok_and(|productions| productions == vec![TestToken::A, TestToken::A, TestToken::A]));
+}
+
+#[test]
 fn describe_produce_it_works() {
     let inner_parser = test_match('a');
     let parser = produce(TestToken::B, inner_parser);

@@ -21,6 +21,23 @@ where
     })
 }
 
+pub fn some<'parser, Consumes, Produces, InnerError>(
+    parser: Parser<'parser, Consumes, Produces, InnerError>,
+) -> Parser<'parser, Consumes, Vec<Produces>, ()>
+where
+    Consumes: 'parser,
+    Produces: 'parser,
+    InnerError: 'parser,
+{
+    Box::new(move |stream| {
+        let mut productions = Vec::new();
+        while let Ok(production) = parser(stream) {
+            productions.push(production);
+        }
+        Ok(productions)
+    })
+}
+
 pub fn produce<'parser, Consumes, Produces, Error, InnerProduces>(
     value: Produces,
     parser: Parser<'parser, Consumes, InnerProduces, Error>,
