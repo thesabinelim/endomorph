@@ -1,9 +1,9 @@
 use super::Parser;
 
 pub fn eof<'parser, Consumes>() -> Parser<'parser, Consumes, (), ()> {
-    Box::new(|stream| match stream.peek() {
+    Box::new(|stream| match stream.next() {
         Ok(_) => Err(()),
-        Err(_) => Ok(()),
+        Err(_) => Ok((stream, ())),
     })
 }
 
@@ -12,10 +12,9 @@ where
     Consumes: 'parser + Eq,
 {
     Box::new(move |stream| {
-        let actual = stream.peek()?;
+        let (next_stream, actual) = stream.next()?;
         if actual == expected {
-            stream.advance()?;
-            Ok(actual)
+            Ok((next_stream, actual))
         } else {
             Err(())
         }

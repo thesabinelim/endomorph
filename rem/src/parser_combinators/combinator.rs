@@ -12,9 +12,8 @@ where
 {
     Box::new(move |stream| {
         for parser in &parsers {
-            let result = parser(stream);
-            if let Ok(production) = result {
-                return Ok(production);
+            if let Ok(result) = parser(stream) {
+                return Ok(result);
             }
         }
         Err(())
@@ -30,11 +29,13 @@ where
     InnerError: 'parser,
 {
     Box::new(move |stream| {
+        let mut next_stream = stream;
         let mut productions = Vec::new();
-        while let Ok(production) = parser(stream) {
-            productions.push(production);
+        while let Ok((inner_next_stream, inner_production)) = parser(next_stream) {
+            next_stream = inner_next_stream;
+            productions.push(inner_production);
         }
-        Ok(productions)
+        Ok((next_stream, productions))
     })
 }
 
@@ -49,11 +50,8 @@ where
     InnerProduces: Any,
 {
     Box::new(move |stream| {
-        let result = parser(stream);
-        match result {
-            Ok(_) => Ok(value),
-            Err(error) => Err(error),
-        }
+        let (next_stream, _) = parser(stream)?;
+        Ok((next_stream, value))
     })
 }
 
@@ -66,14 +64,13 @@ where
     Error: 'parser,
 {
     Box::new(move |stream| {
+        let mut next_stream = stream;
         let mut productions = Vec::new();
         for parser in &parsers {
-            let result = parser(stream);
-            match result {
-                Ok(production) => productions.push(production),
-                Err(error) => return Err(error),
-            }
+            let (inner_next_stream, inner_production) = parser(next_stream)?;
+            next_stream = inner_next_stream;
+            productions.push(inner_production);
         }
-        Ok(productions)
+        Ok((next_stream, productions))
     })
 }

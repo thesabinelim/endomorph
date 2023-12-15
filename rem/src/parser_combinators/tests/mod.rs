@@ -27,6 +27,7 @@ impl TestToken {
     }
 }
 
+#[derive(Clone)]
 pub struct TestTokenStream {
     pub n_advances: usize,
 
@@ -34,29 +35,23 @@ pub struct TestTokenStream {
 }
 
 impl TestTokenStream {
-    fn from<StringT: AsRef<str>>(token_names: StringT) -> TestTokenStream {
+    fn from<StringT: AsRef<str>>(token_names: StringT) -> Box<TestTokenStream> {
         let mut tokens = VecDeque::new();
         for name in token_names.as_ref().chars() {
             tokens.push_back(TestToken::from(name));
         }
-        TestTokenStream {
+        Box::new(TestTokenStream {
             n_advances: 0,
             stream: tokens,
-        }
+        })
     }
 }
 
 impl TokenStream<TestToken> for TestTokenStream {
-    fn advance(&mut self) -> Result<(), ()> {
-        match self.stream.pop_front() {
-            Some(_) => Ok(()),
-            None => Err(()),
-        }
-    }
-
-    fn peek(&self) -> Result<TestToken, ()> {
-        match self.stream.front() {
-            Some(token) => Ok(*token),
+    fn next(&self) -> Result<(Box<dyn TokenStream<TestToken>>, TestToken), ()> {
+        let mut next_stream = self.clone();
+        match next_stream.stream.pop_front() {
+            Some(token) => Ok((Box::new(next_stream), token)),
             None => Err(()),
         }
     }
@@ -65,10 +60,9 @@ impl TokenStream<TestToken> for TestTokenStream {
 pub fn test_match<'parser>(expected_token_name: char) -> Parser<'parser, TestToken, TestToken, ()> {
     let expected = TestToken::from(expected_token_name);
     Box::new(move |stream| {
-        let actual = stream.peek()?;
+        let (next_stream, actual) = stream.next()?;
         if actual == expected {
-            stream.advance()?;
-            Ok(actual)
+            Ok((next_stream, actual))
         } else {
             Err(())
         }
