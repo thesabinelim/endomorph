@@ -1,14 +1,12 @@
 module Endomorph.Lexer.Operator where
 
 import Endomorph.Lexer.Common (Parser)
-import Endomorph.Lexer.Util (symbolChoice)
+import Endomorph.Lexer.Util (symbolToToken)
 import Endomorph.Token (Operator (..), Token (Operator))
-import Text.Megaparsec (choice)
-import Text.Megaparsec.Char (char, string)
 
 operator :: Parser Token
 operator =
-  symbolChoice
+  symbolToToken
     [ ("<<=", Operator LShiftAssign),
       ("**=", Operator PowerAssign),
       (">>=", Operator RShiftAssign),
