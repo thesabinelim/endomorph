@@ -28,7 +28,7 @@ executable hem
     import:
         warnings
     build-depends:
-        base            >=4.17.2.0,
+        base            >=4.17.2.1,
         haskeline       >=0.8.2.1,
         hlint           >=3.6.1,
         megaparsec      >=9.6.1,
