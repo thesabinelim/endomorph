@@ -1,9 +1,8 @@
 module Main where
 
-import Endomorph.Lexer.Spec (lexerSpec)
-import Test.Hspec (describe, hspec)
+import Endomorph.Spec (endomorphSpec)
+import Test.Hspec (hspec)
 
 main :: IO ()
 main = hspec $ do
-  describe "Endomorph" $ do
-    lexerSpec
+  endomorphSpec

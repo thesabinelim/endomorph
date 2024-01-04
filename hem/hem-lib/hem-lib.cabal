@@ -35,6 +35,7 @@ test-suite hem-lib-tests
     ghc-options:        -Wall -Werror
     other-modules:
         Endomorph.Lexer.Spec
+        Endomorph.Spec
     build-depends:
         base            >=4.17.2.1,
         hem-lib,

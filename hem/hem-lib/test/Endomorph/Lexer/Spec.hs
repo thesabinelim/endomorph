@@ -4,6 +4,6 @@ import Test.Hspec (Spec, describe, it, shouldBe)
 
 lexerSpec :: Spec
 lexerSpec = do
-  describe "Endomorph.Lexer" $ do
+  describe "Lexer" $ do
     it "TODO" $ do
       True `shouldBe` True
