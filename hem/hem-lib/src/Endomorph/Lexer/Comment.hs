@@ -6,7 +6,6 @@ import Endomorph.Token (Token (..))
 import Text.Megaparsec
   ( anySingle,
     choice,
-    many,
     manyTill,
     takeWhileP,
   )
@@ -21,12 +20,12 @@ comment =
 
 multiLineComment :: Parser Token
 multiLineComment = do
-  string "/*"
+  _ <- string "/*"
   text <- manyTill anySingle $ string "*/"
   return $ Comment text
 
 singleLineComment :: Parser Token
 singleLineComment = do
-  string "//"
+  _ <- string "//"
   text <- takeWhileP (Just "non-line break character") $ not . isLineBreakChar
   return $ Comment text

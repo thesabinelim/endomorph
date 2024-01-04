@@ -1,10 +1,10 @@
 module Endomorph.Lexer.Util where
 
-import Control.Applicative (Alternative)
 import Data.Foldable (asum)
 import Endomorph.Lexer.Common (Parser)
 import Endomorph.Token (Token)
 import Text.Megaparsec.Char (string)
+import Prelude hiding (sequence)
 
 isLineBreakChar :: Char -> Bool
 isLineBreakChar c = c == '\n' || c == '\r'
@@ -16,5 +16,5 @@ symbolToToken choices = asum $ fmap getToken choices
 
 symbol :: String -> Token -> Parser Token
 symbol sequence token = do
-  string sequence
+  _ <- string sequence
   return token

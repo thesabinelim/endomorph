@@ -17,7 +17,6 @@ import Text.Megaparsec
     runParser,
     takeWhile1P,
   )
-import Text.Megaparsec.Char (space1, string)
 
 lex :: String -> Either (ParseErrorBundle String Void) [Token]
 lex = runParser (tokens <* endOfInput) "stdin"
