@@ -1,6 +1,6 @@
 module Endomorph.Lexer.Common where
 
 import Data.Void (Void)
-import Text.Megaparsec (Parsec)
+import qualified Text.Megaparsec as M (Parsec)
 
-type Parser = Parsec Void String
+type Parser = M.Parsec Void String

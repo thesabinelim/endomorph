@@ -3,7 +3,7 @@ module Endomorph.Lexer.Literal where
 import Data.Char (isDigit, isHexDigit, isOctDigit)
 import Endomorph.Lexer.Common (Parser)
 import Endomorph.Token (Token)
-import Text.Megaparsec (takeWhile1P)
+import qualified Text.Megaparsec as M (takeWhile1P)
 
 literal :: Parser Token
 literal = fail "unimplemented"
@@ -30,13 +30,13 @@ isBinaryDigit :: Char -> Bool
 isBinaryDigit c = c == '0' || c == '1'
 
 binaryDigits :: Parser String
-binaryDigits = takeWhile1P (Just "binary digit") isBinaryDigit
+binaryDigits = M.takeWhile1P (Just "binary digit") isBinaryDigit
 
 octalDigits :: Parser String
-octalDigits = takeWhile1P (Just "octal digit") isOctDigit
+octalDigits = M.takeWhile1P (Just "octal digit") isOctDigit
 
 decimalDigits :: Parser String
-decimalDigits = takeWhile1P (Just "digit") isDigit
+decimalDigits = M.takeWhile1P (Just "digit") isDigit
 
 hexDigits :: Parser String
-hexDigits = takeWhile1P (Just "hexadecimal digit") isHexDigit
+hexDigits = M.takeWhile1P (Just "hexadecimal digit") isHexDigit

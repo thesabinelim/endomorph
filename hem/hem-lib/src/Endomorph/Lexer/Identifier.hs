@@ -4,20 +4,20 @@ import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import Endomorph.Lexer.Common (Parser)
 import Endomorph.Token (Token (Identifier))
-import Text.Megaparsec (choice, many)
-import Text.Megaparsec.Char (alphaNumChar, char, letterChar)
+import qualified Text.Megaparsec as M (choice, many)
+import qualified Text.Megaparsec.Char as C (alphaNumChar, char, letterChar)
 
 identifier :: Parser Token
 identifier = do
   first <-
-    choice
-      [ letterChar,
-        char '_'
+    M.choice
+      [ C.letterChar,
+        C.char '_'
       ]
   rest <-
-    optional . many $
-      choice
-        [ alphaNumChar,
-          char '_'
+    optional . M.many $
+      M.choice
+        [ C.alphaNumChar,
+          C.char '_'
         ]
   return $ Identifier $ first : fromMaybe [] rest
