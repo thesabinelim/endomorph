@@ -19,10 +19,13 @@ import Text.Megaparsec
   )
 
 lex :: String -> Either (ParseErrorBundle String Void) [Token]
-lex = runParser (tokens <* endOfInput) "stdin"
+lex = runParser tokensTillEnd "stdin"
 
-tokens :: Parser [Token]
-tokens = many token
+tokensTillEnd :: Parser [Token]
+tokensTillEnd = do
+  tokens <- many token
+  eoi <- endOfInput
+  return $ tokens ++ [eoi]
 
 token :: Parser Token
 token =
