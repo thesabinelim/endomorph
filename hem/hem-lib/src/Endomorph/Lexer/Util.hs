@@ -3,18 +3,17 @@ module Endomorph.Lexer.Util where
 import Data.Foldable (asum)
 import Endomorph.Lexer.Common (Parser)
 import Endomorph.Token (Token)
-import Text.Megaparsec.Char (string)
-import Prelude hiding (sequence)
+import qualified Text.Megaparsec.Char as C (string)
 
 isLineBreakChar :: Char -> Bool
 isLineBreakChar c = c == '\n' || c == '\r'
 
-symbolToToken :: (Foldable t, Functor t) => t (String, Token) -> Parser Token
-symbolToToken choices = asum $ fmap getToken choices
+stringToToken :: (Foldable t, Functor t) => t (String, Token) -> Parser Token
+stringToToken choices = asum $ fmap getToken choices
   where
-    getToken (sequence, token) = symbol sequence token
+    getToken (string_, token) = string string_ token
 
-symbol :: String -> Token -> Parser Token
-symbol sequence token = do
-  _ <- string sequence
+string :: String -> Token -> Parser Token
+string string_ token = do
+  _ <- C.string string_
   return token

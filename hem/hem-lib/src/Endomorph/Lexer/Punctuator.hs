@@ -1,12 +1,12 @@
 module Endomorph.Lexer.Punctuator where
 
 import Endomorph.Lexer.Common (Parser)
-import Endomorph.Lexer.Util (symbolToToken)
+import Endomorph.Lexer.Util (stringToToken)
 import Endomorph.Token (Punctuator (..), Token (Punctuator))
 
 punctuator :: Parser Token
 punctuator =
-  symbolToToken
+  stringToToken
     [ (":", Punctuator Colon),
       (",", Punctuator Comma),
       ("{", Punctuator LBrace),

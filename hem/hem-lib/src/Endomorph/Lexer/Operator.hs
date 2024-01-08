@@ -1,12 +1,12 @@
 module Endomorph.Lexer.Operator where
 
 import Endomorph.Lexer.Common (Parser)
-import Endomorph.Lexer.Util (symbolToToken)
+import Endomorph.Lexer.Util (stringToToken)
 import Endomorph.Token (Operator (..), Token (Operator))
 
 operator :: Parser Token
 operator =
-  symbolToToken
+  stringToToken
     [ ("<<=", Operator LShiftAssign),
       ("**=", Operator PowerAssign),
       (">>=", Operator RShiftAssign),
