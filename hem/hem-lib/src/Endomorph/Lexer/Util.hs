@@ -8,7 +8,7 @@ import qualified Text.Megaparsec.Char as C (string)
 isLineBreakChar :: Char -> Bool
 isLineBreakChar c = c == '\n' || c == '\r'
 
-stringToToken :: (Foldable t, Functor t) => t (String, Token) -> Parser Token
+stringToToken :: [(String, Token)] -> Parser Token
 stringToToken choices = asum $ fmap getToken choices
   where
     getToken (string_, token) = string string_ token
