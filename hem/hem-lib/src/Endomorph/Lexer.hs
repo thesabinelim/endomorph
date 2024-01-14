@@ -8,7 +8,7 @@ import Endomorph.Lexer.Identifier (identifier)
 import Endomorph.Lexer.Literal (literal)
 import Endomorph.Lexer.Operator (operator)
 import Endomorph.Lexer.Punctuator (punctuator)
-import Endomorph.Token (Token (EndOfInput, Whitespace))
+import Endomorph.Token (Token (End, Whitespace))
 import Text.Megaparsec
   ( ParseErrorBundle,
     choice,
@@ -38,10 +38,10 @@ token =
       whitespace
     ]
 
-endOfInput :: Parser Token
-endOfInput = do
+end :: Parser Token
+end = do
   eof
-  return EndOfInput
+  return End
 
 whitespace :: Parser Token
 whitespace = do

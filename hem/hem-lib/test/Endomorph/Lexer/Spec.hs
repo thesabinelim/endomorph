@@ -15,5 +15,5 @@ lexerSpec = do
             Operator Equality,
             Operator Equality,
             Operator Assign,
-            EndOfInput
+            End
           ]
