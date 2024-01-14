@@ -24,8 +24,8 @@ lex = runParser tokensTillEnd "stdin"
 tokensTillEnd :: Parser [Token]
 tokensTillEnd = do
   tokens <- many token
-  eoi <- endOfInput
-  return $ tokens ++ [eoi]
+  end_ <- end
+  return $ tokens ++ [end_]
 
 token :: Parser Token
 token =
