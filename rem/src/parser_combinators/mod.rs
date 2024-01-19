@@ -1,17 +1,66 @@
+use core::fmt::Debug;
+
 pub mod combinator;
 pub mod parser;
+
 #[cfg(test)]
 mod tests;
 
-pub trait TokenStream<Token> {
-    fn next(&self) -> Result<(Box<dyn TokenStream<Token>>, Token), ()>;
+pub trait Parser<Input> {
+    type Output;
+    type Error;
+
+    fn parse(
+        &self,
+        input: Input,
+    ) -> Result<ParseSuccess<Input, Self::Output>, ParseError<Self::Error>>;
 }
 
-// Boxed only because rustc does't support `impl` in type aliases yet
-// For performance reasons, a parser directly modifies the token stream via the
-// trait methods on consumption rather than return a copy for the remainder
-pub type Parser<'parser, Consumes, Produces, Error> =
-    Box<dyn Fn(Box<dyn TokenStream<Consumes>>) -> ParseResult<Consumes, Produces, Error> + 'parser>;
+#[derive(Debug, Eq, PartialEq)]
+pub struct ParseSuccess<Input, Output> {
+    pub result: Output,
+    pub rest: Input,
+}
 
-pub type ParseResult<Consumes, Produces, Error> =
-    Result<(Box<dyn TokenStream<Consumes>>, Produces), Error>;
+#[derive(Debug, Eq, PartialEq)]
+pub struct ParseError<Error> {
+    pub expected: String,
+    pub recoverable: bool,
+    pub inner_error: Error,
+}
+
+pub trait TokenStream {
+    type Token;
+
+    fn next(&self) -> Result<(Self::Token, Self), TokenStreamError>
+    where
+        Self: Sized;
+}
+
+pub enum TokenStreamError {
+    Eof,
+}
+
+impl TokenStream for &str {
+    type Token = char;
+
+    fn next(&self) -> Result<(char, Self), TokenStreamError> {
+        let mut iter = self.char_indices();
+        match iter.next() {
+            Some((_, first)) => Ok((first, &self[first.len_utf8()..])),
+            None => Err(TokenStreamError::Eof),
+        }
+    }
+}
+
+impl TokenStream for String {
+    type Token = char;
+
+    fn next(&self) -> Result<(char, Self), TokenStreamError> {
+        let mut iter = self.char_indices();
+        match iter.next() {
+            Some((_, first)) => Ok((first, self[first.len_utf8()..].to_string())),
+            None => Err(TokenStreamError::Eof),
+        }
+    }
+}
