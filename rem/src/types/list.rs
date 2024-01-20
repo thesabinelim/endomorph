@@ -8,6 +8,8 @@ where
 {
     type Item;
     type Rest;
+
+    const ITEM: Self::Item;
 }
 
 pub trait ListEnd: List {}
@@ -35,6 +37,8 @@ where
 {
     type Item = Item;
     type Rest = Rest;
+
+    const ITEM: Item = Self::ITEM;
 }
 
 impl List for Nil {
