@@ -6,35 +6,32 @@ pub mod parser;
 #[cfg(test)]
 mod tests;
 
-pub trait Parser<Input> {
+pub trait Parser<Input>: Clone + Sized {
     type Output;
     type Error;
 
     fn parse(
         &self,
         input: Input,
-    ) -> Result<ParseSuccess<Input, Self::Output>, ParseError<Self::Error>>;
+    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>>;
 }
 
-#[derive(Debug, Eq, PartialEq)]
-pub struct ParseSuccess<Input, Output> {
-    pub result: Output,
-    pub rest: Input,
-}
+pub type ParseSuccess<Output, NextInput> = (Output, NextInput);
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub struct ParseError<Error> {
     pub expected: String,
     pub recoverable: bool,
     pub inner_error: Error,
 }
 
-pub trait TokenStream {
+pub trait TokenStream: Clone + Sized
+where
+    Self::Token: Clone + Eq + Sized,
+{
     type Token;
 
-    fn next(&self) -> Result<(Self::Token, Self), TokenStreamError>
-    where
-        Self: Sized;
+    fn next(&self) -> Result<(Self::Token, Self), TokenStreamError>;
 }
 
 pub enum TokenStreamError {

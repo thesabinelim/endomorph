@@ -1,23 +1,17 @@
 use crate::parser_combinators::{
-    parser::{eof, single, EofError, SingleError},
-    ParseError, ParseSuccess, Parser,
+    parser::{Eof, EofError, Single, SingleError},
+    ParseError, Parser,
 };
 
 #[test]
 fn describe_eof_it_works() {
-    assert_eq!(
-        eof().parse(""),
-        Ok(ParseSuccess {
-            result: (),
-            rest: ""
-        })
-    )
+    assert_eq!(Eof.parse(""), Ok(((), "")))
 }
 
 #[test]
 fn describe_eof_it_errors_on_not_eof() {
     assert_eq!(
-        eof().parse("a"),
+        Eof.parse("a"),
         Err(ParseError {
             expected: "EOF".to_string(),
             recoverable: true,
@@ -28,19 +22,13 @@ fn describe_eof_it_errors_on_not_eof() {
 
 #[test]
 fn describe_single_it_works() {
-    assert_eq!(
-        single('a').parse("a"),
-        Ok(ParseSuccess {
-            result: 'a',
-            rest: ""
-        })
-    );
+    assert_eq!(Single('a').parse("a"), Ok(('a', "")));
 }
 
 #[test]
 fn describe_single_it_errors_on_mismatch() {
     assert_eq!(
-        single('a').parse("b"),
+        Single('a').parse("b"),
         Err(ParseError {
             expected: 'a'.to_string(),
             recoverable: true,
@@ -52,7 +40,7 @@ fn describe_single_it_errors_on_mismatch() {
 #[test]
 fn describe_single_it_errors_on_eof() {
     assert_eq!(
-        single('a').parse(""),
+        Single('a').parse(""),
         Err(ParseError {
             expected: 'a'.to_string(),
             recoverable: true,

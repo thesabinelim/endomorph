@@ -2,19 +2,13 @@ use super::{ParseError, ParseSuccess, Parser, TokenStream, TokenStreamError};
 use core::fmt::Debug;
 use std::fmt::Display;
 
-pub fn eof<Input>() -> impl Parser<Input, Output = (), Error = EofError>
-where
-    Input: TokenStream,
-{
-    Eof
-}
+#[derive(Clone)]
+pub struct Eof;
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum EofError {
     NotEof,
 }
-
-struct Eof;
 
 impl<Input> Parser<Input> for Eof
 where
@@ -26,39 +20,25 @@ where
     fn parse(
         &self,
         input: Input,
-    ) -> Result<ParseSuccess<Input, Self::Output>, ParseError<Self::Error>> {
+    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
         match input.next() {
             Ok(_) => Err(ParseError {
                 expected: "EOF".to_string(),
                 recoverable: true,
                 inner_error: EofError::NotEof,
             }),
-            Err(_) => Ok(ParseSuccess {
-                result: (),
-                rest: input,
-            }),
+            Err(_) => Ok(((), input)),
         }
     }
 }
 
-pub fn single<Input>(
-    expected: Input::Token,
-) -> impl Parser<Input, Output = Input::Token, Error = SingleError>
-where
-    Input: TokenStream,
-    Input::Token: Display + Eq,
-{
-    Single { expected }
-}
+#[derive(Clone)]
+pub struct Single<Token>(pub Token);
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum SingleError {
     Mismatch,
     Eof,
-}
-
-struct Single<Token> {
-    pub expected: Token,
 }
 
 impl<Input> Parser<Input> for Single<Input::Token>
@@ -72,24 +52,22 @@ where
     fn parse(
         &self,
         input: Input,
-    ) -> Result<ParseSuccess<Input, Self::Output>, ParseError<Self::Error>> {
+    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+        let Single(expected) = self;
         match input.next() {
             Ok((actual, rest)) => {
-                if actual == self.expected {
-                    Ok(ParseSuccess {
-                        result: actual,
-                        rest,
-                    })
+                if actual == *expected {
+                    Ok((actual, rest))
                 } else {
                     Err(ParseError {
-                        expected: self.expected.to_string(),
+                        expected: expected.to_string(),
                         recoverable: true,
                         inner_error: SingleError::Mismatch,
                     })
                 }
             }
             Err(TokenStreamError::Eof) => Err(ParseError {
-                expected: self.expected.to_string(),
+                expected: expected.to_string(),
                 recoverable: true,
                 inner_error: SingleError::Eof,
             }),
