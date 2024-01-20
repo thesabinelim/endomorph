@@ -10,33 +10,6 @@ macro_rules! list {
 
 pub(crate) use list;
 
-pub trait ListCons
-where
-    Self: List,
-    Self::Item: Clone + PartialEq,
-    Self::Rest: List,
-{
-    type Item;
-    type Rest;
-
-    fn head(&self) -> Self::Item;
-
-    fn rest(&self) -> Self::Rest;
-}
-
-pub trait ListNil
-where
-    Self: List,
-{
-}
-
-pub trait List
-where
-    Self: Clone + PartialEq,
-{
-    const LEN: usize;
-}
-
 #[derive(Clone, Debug)]
 pub struct Cons<Item, Rest>
 where
@@ -58,19 +31,23 @@ where
 #[derive(Clone, Debug)]
 pub struct Nil;
 
-impl<Item, Rest> ListCons for Cons<Item, Rest>
+pub trait List
+where
+    Self: Clone + PartialEq,
+{
+    const LEN: usize;
+}
+
+impl<Item, Rest> Cons<Item, Rest>
 where
     Item: Clone + PartialEq,
     Rest: List,
 {
-    type Item = Item;
-    type Rest = Rest;
-
-    fn head(&self) -> Self::Item {
+    fn head(&self) -> Item {
         self.item.clone()
     }
 
-    fn rest(&self) -> Self::Rest {
+    fn rest(&self) -> Rest {
         self.rest.clone()
     }
 }
@@ -94,7 +71,7 @@ where
     }
 }
 
-impl ListNil for Nil {}
+impl Nil {}
 
 impl List for Nil {
     const LEN: usize = 0;
