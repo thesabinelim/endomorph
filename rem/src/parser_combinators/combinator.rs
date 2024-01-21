@@ -15,7 +15,7 @@ where
     Input: TokenStream,
     Parsers: LikeParserList<Input, Output>,
 {
-    pub fn of(parsers: Parsers) -> Choice<Input, Output, Parsers> {
+    pub fn of(parsers: Parsers) -> Self {
         Choice(parsers, PhantomData, PhantomData)
     }
 }
@@ -60,26 +60,24 @@ where
                             expected,
                             recoverable,
                             inner_error: _,
-                        }) => {
-                            if recoverable {
-                                Err(ParseError {
-                                    expected: self.expected(),
-                                    recoverable: true,
-                                    inner_error: ChoiceError::AllFailed,
-                                })
-                            } else {
-                                Err(ParseError {
-                                    expected,
-                                    recoverable: false,
-                                    inner_error: ChoiceError::Unrecoverable,
-                                })
+                        }) => Err(if recoverable {
+                            ParseError {
+                                expected: self.expected(),
+                                recoverable,
+                                inner_error: ChoiceError::AllFailed,
                             }
-                        }
+                        } else {
+                            ParseError {
+                                expected,
+                                recoverable,
+                                inner_error: ChoiceError::Unrecoverable,
+                            }
+                        }),
                     }
                 } else {
                     Err(ParseError {
                         expected,
-                        recoverable: false,
+                        recoverable,
                         inner_error: ChoiceError::Unrecoverable,
                     })
                 }
@@ -110,21 +108,19 @@ where
                 expected,
                 recoverable,
                 inner_error: _,
-            }) => {
-                if recoverable {
-                    Err(ParseError {
-                        expected: self.expected(),
-                        recoverable: true,
-                        inner_error: ChoiceError::AllFailed,
-                    })
-                } else {
-                    Err(ParseError {
-                        expected,
-                        recoverable: false,
-                        inner_error: ChoiceError::Unrecoverable,
-                    })
+            }) => Err(if recoverable {
+                ParseError {
+                    expected: self.expected(),
+                    recoverable,
+                    inner_error: ChoiceError::AllFailed,
                 }
-            }
+            } else {
+                ParseError {
+                    expected,
+                    recoverable,
+                    inner_error: ChoiceError::Unrecoverable,
+                }
+            }),
         }
     }
 }
@@ -164,20 +160,130 @@ where
 //     }
 // }
 
-// pub struct Sequence<I, O, E> {
-//     of: Vec<dyn Parser<I, O, E>>,
-// }
+#[derive(Clone, PartialEq)]
+pub struct Sequence<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
+where
+    Input: TokenStream,
+    Parsers: LikeParserList<Input, Output>;
 
-// impl<I, O, E> Parser<I, Vec<Result<O, E>>, E> for Sequence<I, O, E> {
-//     fn parse(&mut self, input: impl TokenStream<I>) {
-//         let mut res = Vec::new();
-//         for parser in self.parsers {
-//             let inner_res = parser(input)?;
-//             res.push(inner_res);
-//         }
-//         Ok(res)
-//     }
-// }
+impl<Input, Output, Parsers> Sequence<Input, Output, Parsers>
+where
+    Input: TokenStream,
+    Parsers: LikeParserList<Input, Output>,
+{
+    pub fn of(parsers: Parsers) -> Self {
+        Sequence(parsers, PhantomData, PhantomData)
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum SequenceError {
+    Failed,
+    Unrecoverable,
+}
+
+impl<Input, Output, Item, Rest> Parser<Input> for Sequence<Input, Output, ListOf![Item, ..Rest]>
+where
+    Input: TokenStream,
+    Output: Clone + PartialEq + Debug,
+    Item: Parser<Input, Output = Output>,
+    Rest: LikeParserList<Input, Output> + ListCons,
+    Sequence<Input, Output, Rest>: Parser<Input, Output = Vec<Output>>,
+{
+    type Output = Vec<Output>;
+    type Error = SequenceError;
+
+    fn expected(&self) -> String {
+        let ListPat![parser, ..rest] = &self.0;
+        let expected = parser.expected();
+        let rest_expected = Sequence::of(rest.clone()).expected();
+        format!("{}, {}", expected, rest_expected)
+    }
+
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
+        let ListPat![parser, ..rest] = &self.0;
+        match parser.parse(input.clone()) {
+            Ok((output, next_input)) => match Sequence::of(rest.clone()).parse(next_input) {
+                Ok((rest_output, next_input)) => {
+                    Ok((vec![vec![output], rest_output].concat(), next_input))
+                }
+                Err(ParseError {
+                    expected,
+                    recoverable,
+                    inner_error: _,
+                }) => Err(if recoverable {
+                    ParseError {
+                        expected: self.expected(),
+                        recoverable,
+                        inner_error: SequenceError::Failed,
+                    }
+                } else {
+                    ParseError {
+                        expected,
+                        recoverable,
+                        inner_error: SequenceError::Unrecoverable,
+                    }
+                }),
+            },
+            Err(ParseError {
+                expected,
+                recoverable,
+                inner_error: _,
+            }) => Err(if recoverable {
+                ParseError {
+                    expected: self.expected(),
+                    recoverable,
+                    inner_error: SequenceError::Failed,
+                }
+            } else {
+                ParseError {
+                    expected,
+                    recoverable,
+                    inner_error: SequenceError::Unrecoverable,
+                }
+            }),
+        }
+    }
+}
+
+impl<Input, Output, Item> Parser<Input> for Sequence<Input, Output, ListOf![Item]>
+where
+    Input: TokenStream,
+    Output: Clone + PartialEq + Debug,
+    Item: Parser<Input, Output = Output>,
+{
+    type Output = Vec<Output>;
+    type Error = SequenceError;
+
+    fn expected(&self) -> String {
+        let ListPat![parser, .._] = &self.0;
+        parser.expected()
+    }
+
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
+        let ListPat![parser, .._] = &self.0;
+        match parser.parse(input) {
+            Ok((output, next_input)) => Ok((vec![output], next_input)),
+            Err(ParseError {
+                expected,
+                recoverable,
+                inner_error: _,
+            }) => Err(if recoverable {
+                ParseError {
+                    expected: self.expected(),
+                    recoverable,
+                    inner_error: SequenceError::Failed,
+                }
+            } else {
+                ParseError {
+                    expected,
+                    recoverable,
+                    inner_error: SequenceError::Unrecoverable,
+                }
+            }),
+        }
+    }
+}
 
 #[derive(Clone, PartialEq)]
 pub struct Unrecoverable<Input, InnerParser>(InnerParser, PhantomData<Input>)

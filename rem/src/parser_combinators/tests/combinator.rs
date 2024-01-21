@@ -1,6 +1,6 @@
 use crate::{
     parser_combinators::{
-        combinator::{Choice, ChoiceError, Unrecoverable},
+        combinator::{Choice, ChoiceError, Sequence, SequenceError, Unrecoverable},
         parser::{Single, SingleError},
         ParseError, Parser,
     },
@@ -85,21 +85,41 @@ fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
 //     assert!(parser(TestTokenStream::from("b")).is_err());
 // }
 
-// #[test]
-// fn describe_sequence_it_works() {
-//     let inner_parsers = test_matches("abc");
-//     let parser = sequence(inner_parsers);
-//     assert!(parser(TestTokenStream::from("abc")).is_ok_and(
-//         |(_, productions)| productions == vec![TestToken::A, TestToken::B, TestToken::C]
-//     ));
-// }
+#[test]
+fn describe_sequence_it_works() {
+    let parser = Sequence::of(list![Single('a'), Single('b'), Single('c')]);
+    assert_eq!(parser.parse("abcd"), Ok((vec!['a', 'b', 'c'], "d")));
+}
 
-// #[test]
-// fn describe_sequence_it_errors_on_inner_parser_error() {
-//     let inner_parsers = test_matches("ab");
-//     let parser = sequence(inner_parsers);
-//     assert!(parser(TestTokenStream::from("aa")).is_err());
-// }
+#[test]
+fn describe_sequence_it_errors_on_inner_parser_error() {
+    let parser = Sequence::of(list![Single('a'), Single('b'), Single('c')]);
+    assert_eq!(
+        parser.parse("abd"),
+        Err(ParseError {
+            expected: "a, b, c".to_string(),
+            recoverable: true,
+            inner_error: SequenceError::Failed
+        })
+    );
+}
+
+#[test]
+fn describe_sequence_it_errors_on_inner_parser_unrecoverable_error() {
+    let parser = Sequence::of(list![
+        Single('a'),
+        Unrecoverable::of(Single('b')),
+        Single('c')
+    ]);
+    assert_eq!(
+        parser.parse("adc"),
+        Err(ParseError {
+            expected: "b".to_string(),
+            recoverable: false,
+            inner_error: SequenceError::Unrecoverable
+        })
+    );
+}
 
 #[test]
 fn describe_unrecoverable_it_works() {
