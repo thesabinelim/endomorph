@@ -1,6 +1,6 @@
 use crate::{
     parser_combinators::{
-        combinator::{Choice, ChoiceError},
+        combinator::{Choice, ChoiceError, Unrecoverable},
         parser::Single,
         ParseError, Parser,
     },
@@ -21,7 +21,7 @@ fn describe_choice_it_errors_on_all_inner_parser_error() {
     assert_eq!(
         parser.parse("d"),
         Err(ParseError {
-            expected: "".to_string(),
+            expected: "a or b or c".to_string(),
             recoverable: true,
             inner_error: ChoiceError::AllFailed
         })
@@ -30,11 +30,15 @@ fn describe_choice_it_errors_on_all_inner_parser_error() {
 
 #[test]
 fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Choice::of(list![Single('a'), Single('b'), Single('c')]);
+    let parser = Choice::of(list![
+        Single('a'),
+        Unrecoverable::of(Single('b')),
+        Single('c')
+    ]);
     assert_eq!(
-        parser.parse("d"),
+        parser.parse("c"),
         Err(ParseError {
-            expected: "".to_string(),
+            expected: "b".to_string(),
             recoverable: false,
             inner_error: ChoiceError::Unrecoverable
         })

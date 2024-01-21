@@ -56,15 +56,29 @@ where
                 if recoverable {
                     match Choice::of(rest.clone()).parse(input) {
                         Ok(result) => Ok(result),
-                        Err(_) => Err(ParseError {
-                            expected: expected,
-                            recoverable: true,
-                            inner_error: ChoiceError::AllFailed,
-                        }),
+                        Err(ParseError {
+                            expected,
+                            recoverable,
+                            inner_error: _,
+                        }) => {
+                            if recoverable {
+                                Err(ParseError {
+                                    expected: self.expected(),
+                                    recoverable: true,
+                                    inner_error: ChoiceError::AllFailed,
+                                })
+                            } else {
+                                Err(ParseError {
+                                    expected,
+                                    recoverable: false,
+                                    inner_error: ChoiceError::Unrecoverable,
+                                })
+                            }
+                        }
                     }
                 } else {
                     Err(ParseError {
-                        expected: expected,
+                        expected,
                         recoverable: false,
                         inner_error: ChoiceError::Unrecoverable,
                     })
@@ -99,13 +113,13 @@ where
             }) => {
                 if recoverable {
                     Err(ParseError {
-                        expected: expected,
+                        expected: self.expected(),
                         recoverable: true,
                         inner_error: ChoiceError::AllFailed,
                     })
                 } else {
                     Err(ParseError {
-                        expected: expected,
+                        expected,
                         recoverable: false,
                         inner_error: ChoiceError::Unrecoverable,
                     })
@@ -164,3 +178,47 @@ where
 //         Ok(res)
 //     }
 // }
+
+#[derive(Clone, PartialEq)]
+pub struct Unrecoverable<Input, InnerParser>(InnerParser, PhantomData<Input>)
+where
+    Input: TokenStream,
+    InnerParser: Parser<Input>;
+
+impl<Input, InnerParser> Unrecoverable<Input, InnerParser>
+where
+    Input: TokenStream,
+    InnerParser: Parser<Input>,
+{
+    pub fn of(parser: InnerParser) -> Unrecoverable<Input, InnerParser> {
+        Unrecoverable(parser, PhantomData)
+    }
+}
+
+impl<Input, InnerParser> Parser<Input> for Unrecoverable<Input, InnerParser>
+where
+    Input: TokenStream,
+    InnerParser: Parser<Input>,
+{
+    type Output = InnerParser::Output;
+    type Error = InnerParser::Error;
+
+    fn expected(&self) -> String {
+        self.0.expected()
+    }
+
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
+        match self.0.parse(input) {
+            Ok(result) => Ok(result),
+            Err(ParseError {
+                expected,
+                recoverable: _,
+                inner_error,
+            }) => Err(ParseError {
+                expected,
+                recoverable: false,
+                inner_error,
+            }),
+        }
+    }
+}
