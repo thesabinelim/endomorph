@@ -49,11 +49,15 @@ macro_rules! ListPat {
 
 pub(crate) use ListPat;
 
+pub trait ListCons: List {}
+
 #[derive(Clone, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)
 where
     Item: Clone + PartialEq,
     Rest: List;
+
+pub trait ListNil: List {}
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Nil;
@@ -80,6 +84,13 @@ pub trait List: Clone + PartialEq {
     fn prepend<T>(&self, item: T) -> Self::PrependResult<T>
     where
         T: Clone + PartialEq;
+}
+
+impl<Item, Rest> ListCons for Cons<Item, Rest>
+where
+    Item: Clone + PartialEq,
+    Rest: List,
+{
 }
 
 impl<Item, Rest> List for Cons<Item, Rest>
@@ -112,6 +123,8 @@ where
         Cons(item, self.clone())
     }
 }
+
+impl ListNil for Nil {}
 
 impl List for Nil {
     const LEN: usize = 0;

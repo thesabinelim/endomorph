@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use core::marker::PhantomData;
 
 use super::{LikeParserList, ParseError, Parser, TokenStream};
-use crate::types::list::{ListOf, ListPat};
+use crate::types::list::{ListCons, ListOf, ListPat};
 
 #[derive(Clone, PartialEq)]
 pub struct Choice<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
@@ -26,15 +26,13 @@ pub enum ChoiceError {
     Unrecoverable,
 }
 
-impl<Input, Output, Item, NextItem, Rest> Parser<Input>
-    for Choice<Input, Output, ListOf![Item, NextItem, ..Rest]>
+impl<Input, Output, Item, Rest> Parser<Input> for Choice<Input, Output, ListOf![Item, ..Rest]>
 where
     Input: TokenStream,
     Output: Clone + PartialEq + Debug,
     Item: Parser<Input, Output = Output>,
-    NextItem: Parser<Input, Output = Output>,
-    Rest: LikeParserList<Input, Output>,
-    Choice<Input, Output, ListOf![NextItem, ..Rest]>: Parser<Input, Output = Output>,
+    Rest: LikeParserList<Input, Output> + ListCons,
+    Choice<Input, Output, Rest>: Parser<Input, Output = Output>,
 {
     type Output = Output;
     type Error = ChoiceError;
