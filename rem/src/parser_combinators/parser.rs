@@ -17,6 +17,10 @@ where
     type Output = ();
     type Error = EofError;
 
+    fn expected(&self) -> String {
+        "EOF".to_string()
+    }
+
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         match input.next() {
             Ok(_) => Err(ParseError {
@@ -45,6 +49,10 @@ where
 {
     type Output = Input::Token;
     type Error = SingleError;
+
+    fn expected(&self) -> String {
+        self.0.to_string()
+    }
 
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let Single(expected) = self;

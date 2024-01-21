@@ -37,9 +37,15 @@ where
     type Output = Output;
     type Error = ChoiceError;
 
+    fn expected(&self) -> String {
+        let ListPat![parser, ..rest] = &self.0;
+        let expected = parser.expected();
+        let rest_expected = Choice::of(rest.clone()).expected();
+        format!("{} or {}", expected, rest_expected)
+    }
+
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
-        let of = &self.0;
-        let ListPat![parser, ..rest] = of;
+        let ListPat![parser, ..rest] = &self.0;
         match parser.parse(input.clone()) {
             Ok(result) => Ok(result),
             Err(ParseError {
@@ -77,9 +83,13 @@ where
     type Output = Output;
     type Error = ChoiceError;
 
+    fn expected(&self) -> String {
+        let ListPat![parser, .._] = &self.0;
+        parser.expected()
+    }
+
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
-        let of = &self.0;
-        let ListPat![parser, .._] = of;
+        let ListPat![parser, .._] = &self.0;
         match parser.parse(input) {
             Ok(result) => Ok(result),
             Err(ParseError {

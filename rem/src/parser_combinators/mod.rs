@@ -12,6 +12,8 @@ pub trait Parser<Input>: Clone + PartialEq {
     type Output: Clone + PartialEq + Debug;
     type Error;
 
+    fn expected(&self) -> String;
+
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>>;
 }
 
