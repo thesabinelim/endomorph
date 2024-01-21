@@ -1,7 +1,7 @@
 use crate::{
     parser_combinators::{
         combinator::{Choice, ChoiceError, Unrecoverable},
-        parser::Single,
+        parser::{Single, SingleError},
         ParseError, Parser,
     },
     types::list::list,
@@ -100,3 +100,20 @@ fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
 //     let parser = sequence(inner_parsers);
 //     assert!(parser(TestTokenStream::from("aa")).is_err());
 // }
+
+#[test]
+fn describe_unrecoverable_it_works() {
+    assert_eq!(
+        Unrecoverable::of(Single('a')).parse("b"),
+        Err(ParseError {
+            expected: "a".to_string(),
+            recoverable: false,
+            inner_error: SingleError::Mismatch,
+        })
+    );
+}
+
+#[test]
+fn describe_unrecoverable_it_propagates_successes() {
+    assert_eq!(Unrecoverable::of(Single('a')).parse("a"), Ok(('a', "")));
+}
