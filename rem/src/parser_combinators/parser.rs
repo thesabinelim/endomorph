@@ -1,8 +1,7 @@
 use super::{ParseError, ParseSuccess, Parser, TokenStream, TokenStreamError};
-use core::fmt::Debug;
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Eof;
 
 #[derive(Debug, Eq, PartialEq)]
@@ -32,7 +31,7 @@ where
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Single<Token>(pub Token);
 
 #[derive(Debug, Eq, PartialEq)]
@@ -44,7 +43,7 @@ pub enum SingleError {
 impl<Input> Parser<Input> for Single<Input::Token>
 where
     Input: TokenStream,
-    Input::Token: Display + Eq,
+    Input::Token: Clone + Display + Eq + Debug,
 {
     type Output = Input::Token;
     type Error = SingleError;

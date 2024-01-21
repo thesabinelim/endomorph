@@ -1,18 +1,45 @@
-// use crate::parser_combinators::{combinator::choice, tests::test_match, ParseSuccess};
+use crate::{
+    parser_combinators::{
+        combinator::{Choice, ChoiceError},
+        parser::Single,
+        ParseError, Parser,
+    },
+    types::list::list,
+};
 
-// #[test]
-// fn describe_choice_it_works() {
-//     let parser = choice(vec![test_match('a'), test_match('b'), test_match('c')]);
-//     assert!(parser("a").is_ok_and(|ParseSuccess { result, rest }| result == 'a'));
-//     assert!(parser("b").is_ok_and(|ParseSuccess { result, rest }| result == 'b'));
-//     assert!(parser("c").is_ok_and(|ParseSuccess { result, rest }| result == 'c'));
-// }
+#[test]
+fn describe_choice_it_works() {
+    let parser = Choice(list![Single('a'), Single('b'), Single('c')]);
+    assert_eq!(parser.parse("a"), Ok(('a', "")));
+    assert_eq!(parser.parse("b"), Ok(('b', "")));
+    assert_eq!(parser.parse("c"), Ok(('c', "")));
+}
 
-// #[test]
-// fn describe_choice_it_errors_on_all_inner_parser_error() {
-//     let parser = choice(vec![test_match('a'), test_match('b'), test_match('c')]);
-//     assert!(parser("d").is_err());
-// }
+#[test]
+fn describe_choice_it_errors_on_all_inner_parser_error() {
+    let parser = Choice(list![Single('a'), Single('b'), Single('c')]);
+    assert_eq!(
+        parser.parse("d"),
+        Err(ParseError {
+            expected: "".to_string(),
+            recoverable: true,
+            inner_error: ChoiceError::AllFailed
+        })
+    );
+}
+
+#[test]
+fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
+    let parser = Choice(list![Single('a'), Single('b'), Single('c')]);
+    assert_eq!(
+        parser.parse("d"),
+        Err(ParseError {
+            expected: "".to_string(),
+            recoverable: false,
+            inner_error: ChoiceError::Unrecoverable
+        })
+    );
+}
 
 // #[test]
 // fn describe_some_it_works_with_no_matches() {

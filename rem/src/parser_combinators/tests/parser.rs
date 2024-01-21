@@ -5,7 +5,7 @@ use crate::parser_combinators::{
 
 #[test]
 fn describe_eof_it_works() {
-    assert_eq!(Eof.parse(""), Ok(((), "")))
+    assert_eq!(Eof.parse(""), Ok(((), "")));
 }
 
 #[test]
@@ -17,7 +17,7 @@ fn describe_eof_it_errors_on_not_eof() {
             recoverable: true,
             inner_error: EofError::NotEof
         })
-    )
+    );
 }
 
 #[test]

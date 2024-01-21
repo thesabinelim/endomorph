@@ -1,4 +1,4 @@
-use core::fmt::Debug;
+use std::fmt::Debug;
 
 pub mod combinator;
 pub mod parser;
@@ -6,7 +6,10 @@ pub mod parser;
 #[cfg(test)]
 mod tests;
 
-pub trait Parser<Input>: Clone + Sized {
+pub trait Parser<Input>: Clone + PartialEq
+where
+    Self::Output: Clone + Eq + Debug,
+{
     type Output;
     type Error;
 
@@ -25,9 +28,9 @@ pub struct ParseError<Error> {
     pub inner_error: Error,
 }
 
-pub trait TokenStream: Clone + Sized
+pub trait TokenStream: Clone
 where
-    Self::Token: Clone + Eq + Sized,
+    Self::Token: Clone + Eq,
 {
     type Token;
 

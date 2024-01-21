@@ -1,11 +1,113 @@
-// use core::fmt::Debug;
-// use std::any::Any;
+use super::{ParseError, ParseSuccess, Parser, TokenStream};
 
-// use super::{ParseError, ParseSuccess, Parser, TokenStream};
+use crate::types::list::{Cons, List, Nil};
 
-// pub fn choice<Input, Output>(
-//     between: Vec<dyn Parser<Input, Output = Output, Error = dyn Any>>,
-// ) -> impl Parser<Input, Output = Output, Error = ChoiceError> {
+#[derive(Clone, PartialEq)]
+pub struct Choice<Parsers>(pub Parsers)
+where
+    Parsers: List;
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum ChoiceError {
+    AllFailed,
+    Unrecoverable,
+}
+
+impl<Input, Item, Rest> Parser<Input> for Choice<Cons<Item, Rest>>
+where
+    Input: TokenStream,
+    Item: Parser<Input> + Clone + PartialEq,
+    Rest: List,
+{
+    type Output = <Item as Parser<Input>>::Output;
+    type Error = ChoiceError;
+
+    fn parse(
+        &self,
+        input: Input,
+    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+        let Choice(between) = self;
+        let Cons(parser, rest) = between;
+        match parser.parse(input) {
+            Ok(result) => Ok(result),
+            Err(ParseError {
+                expected,
+                recoverable,
+                inner_error,
+            }) => {
+                if recoverable {
+                    Choice(rest.clone()).parse(input)
+                } else {
+                    Err(ParseError {
+                        expected: expected,
+                        recoverable: false,
+                        inner_error: ChoiceError::Unrecoverable,
+                    })
+                }
+            }
+        }
+    }
+}
+
+impl<Input> Parser<Input> for Choice<Nil>
+where
+    Input: TokenStream,
+{
+    type Output = ();
+    type Error = ChoiceError;
+
+    fn parse(
+        &self,
+        _input: Input,
+    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+        Err(ParseError {
+            expected: "".to_string(),
+            recoverable: true,
+            inner_error: ChoiceError::AllFailed,
+        })
+    }
+}
+
+// trait ChoiceCombinator<Input, Parsers>
+// where
+//     Input: TokenStream,
+//     Parsers: List,
+// {
+//     fn choice(&self, between: Parsers) -> impl Parser<Input>;
+// }
+
+// impl<Input, Parsers> ChoiceCombinator<Input, Parsers> for Choice<Parsers>
+// where
+//     Input: TokenStream,
+//     Parsers: List,
+// {
+//     fn choice(&self, between: Parsers) -> impl Parser<Input> {
+
+//     }
+// }
+
+// impl<Input> ChoiceCombinator<Input, Nil> for Nil
+// where
+//     Input: TokenStream,
+// {
+//     fn choice(&self, between: Nil) -> impl Parser<Input> {
+//         "".to_string()
+//     }
+// }
+
+// impl<Input, Item, Rest> ChoiceCombinator<Input, Cons<Item, Rest>> for Cons<Item, Rest>
+// where
+//     Input: TokenStream,
+// {
+//     fn choice(&self, between: Cons<Item, Rest>) -> impl Parser<Input> {
+//         todo!()
+//     }
+// }
+
+// pub fn choice<Parsers>(between: Parsers) -> Choice<Parsers>
+// where
+//     Parsers: List,
+// {
 //     Choice { between }
 // }
 
@@ -15,8 +117,8 @@
 //     AllFailed,
 // }
 
-// struct Choice<Input, Output> {
-//     pub between: Vec<dyn Parser<Input, Output = Output, Error = dyn Any>>,
+// struct Choice<Parsers> {
+//     pub between: Parsers,
 // }
 
 // impl<Input, Output> Parser<Input> for Choice<Input, Output> {
