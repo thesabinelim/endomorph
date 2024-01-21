@@ -1,21 +1,22 @@
+use core::fmt::Debug;
 use core::marker::PhantomData;
 
-use super::{ParseError, Parser, ParserList, TokenStream};
-use crate::types::list::{list, List, ListOf, ListPat};
+use super::{LikeParserList, ParseError, Parser, TokenStream};
+use crate::types::list::{ListOf, ListPat};
 
 #[derive(Clone, PartialEq)]
-pub struct Choice<Input, Parsers>(Parsers, PhantomData<Input>)
+pub struct Choice<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
 where
     Input: TokenStream,
-    Parsers: ParserList<Input>;
+    Parsers: LikeParserList<Input, Output>;
 
-impl<Input, Parsers> Choice<Input, Parsers>
+impl<Input, Output, Parsers> Choice<Input, Output, Parsers>
 where
     Input: TokenStream,
-    Parsers: ParserList<Input>,
+    Parsers: LikeParserList<Input, Output>,
 {
-    pub fn of(parsers: Parsers) -> Choice<Input, Parsers> {
-        Choice(parsers, PhantomData)
+    pub fn of(parsers: Parsers) -> Choice<Input, Output, Parsers> {
+        Choice(parsers, PhantomData, PhantomData)
     }
 }
 
@@ -25,23 +26,24 @@ pub enum ChoiceError {
     Unrecoverable,
 }
 
-impl<Input, Item, NextItem, Rest> Parser<Input> for Choice<Input, ListOf![Item, NextItem, ..Rest]>
+impl<Input, Output, Item, NextItem, Rest> Parser<Input>
+    for Choice<Input, Output, ListOf![Item, NextItem, ..Rest]>
 where
     Input: TokenStream,
-    Item: Parser<Input>,
-    NextItem: Parser<Input>,
-    NextItem::Output: List,
-    Rest: ParserList<Input>,
-    Choice<Input, ListOf![NextItem, ..Rest]>: Parser<Input>,
+    Output: Clone + PartialEq + Debug,
+    Item: Parser<Input, Output = Output>,
+    NextItem: Parser<Input, Output = Output>,
+    Rest: LikeParserList<Input, Output>,
+    Choice<Input, Output, ListOf![NextItem, ..Rest]>: Parser<Input, Output = Output>,
 {
-    type Output = ListOf![Item::Output, ..NextItem::Output];
+    type Output = Output;
     type Error = ChoiceError;
 
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
-        let of = self.0;
+        let of = &self.0;
         let ListPat![parser, ..rest] = of;
         match parser.parse(input.clone()) {
-            Ok(result) => Ok(list![result]),
+            Ok(result) => Ok(result),
             Err(ParseError {
                 expected,
                 recoverable,
@@ -50,7 +52,7 @@ where
                 if recoverable {
                     match Choice::of(rest.clone()).parse(input) {
                         Ok(result) => Ok(result),
-                        Err(error) => Err(ParseError {
+                        Err(_) => Err(ParseError {
                             expected: expected,
                             recoverable: true,
                             inner_error: ChoiceError::AllFailed,
@@ -68,16 +70,17 @@ where
     }
 }
 
-impl<Input, Item> Parser<Input> for Choice<Input, ListOf![Item]>
+impl<Input, Output, Item> Parser<Input> for Choice<Input, Output, ListOf![Item]>
 where
     Input: TokenStream,
-    Item: Parser<Input>,
+    Output: Clone + PartialEq + Debug,
+    Item: Parser<Input, Output = Output>,
 {
-    type Output = Item::Output;
+    type Output = Output;
     type Error = ChoiceError;
 
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
-        let of = self.0;
+        let of = &self.0;
         let ListPat![parser, .._] = of;
         match parser.parse(input) {
             Ok(result) => Ok(result),

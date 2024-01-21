@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 use crate::types::list::{List, ListOf};
 
@@ -32,6 +32,17 @@ where
 }
 
 impl<Input> ParserList<Input> for ListOf![] {}
+
+pub trait LikeParserList<Input, Output>: ParserList<Input> {}
+
+impl<Input, Output, Item, Rest> LikeParserList<Input, Output> for ListOf![Item, ..Rest]
+where
+    Item: Parser<Input, Output = Output>,
+    Rest: LikeParserList<Input, Output>,
+{
+}
+
+impl<Input, Output> LikeParserList<Input, Output> for ListOf![] {}
 
 pub trait TokenStream: Clone + PartialEq {
     type Token: Clone + Eq;
