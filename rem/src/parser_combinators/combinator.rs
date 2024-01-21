@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{ParseError, ParseSuccess, Parser, ParserList, TokenStream};
+use super::{ParseError, Parser, ParserList, TokenStream};
 use crate::types::list::{list, List, ListOf, ListPat};
 
 #[derive(Clone, PartialEq)]
@@ -37,10 +37,7 @@ where
     type Output = ListOf![Item::Output, ..NextItem::Output];
     type Error = ChoiceError;
 
-    fn parse(
-        &self,
-        input: Input,
-    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let of = self.0;
         let ListPat![parser, ..rest] = of;
         match parser.parse(input.clone()) {
@@ -79,10 +76,7 @@ where
     type Output = Item::Output;
     type Error = ChoiceError;
 
-    fn parse(
-        &self,
-        input: Input,
-    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let of = self.0;
         let ListPat![parser, .._] = of;
         match parser.parse(input) {

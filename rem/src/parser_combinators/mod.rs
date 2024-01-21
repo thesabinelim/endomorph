@@ -12,13 +12,8 @@ pub trait Parser<Input>: Clone + PartialEq {
     type Output: Clone + PartialEq + Debug;
     type Error;
 
-    fn parse(
-        &self,
-        input: Input,
-    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>>;
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>>;
 }
-
-pub type ParseSuccess<Output, NextInput> = (Output, NextInput);
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct ParseError<Error> {

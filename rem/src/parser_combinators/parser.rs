@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use super::{ParseError, ParseSuccess, Parser, TokenStream, TokenStreamError};
+use super::{ParseError, Parser, TokenStream, TokenStreamError};
 
 #[derive(Clone, PartialEq)]
 pub struct Eof;
@@ -17,10 +17,7 @@ where
     type Output = ();
     type Error = EofError;
 
-    fn parse(
-        &self,
-        input: Input,
-    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         match input.next() {
             Ok(_) => Err(ParseError {
                 expected: "EOF".to_string(),
@@ -49,10 +46,7 @@ where
     type Output = Input::Token;
     type Error = SingleError;
 
-    fn parse(
-        &self,
-        input: Input,
-    ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
+    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let Single(expected) = self;
         match input.next() {
             Ok((actual, rest)) => {
