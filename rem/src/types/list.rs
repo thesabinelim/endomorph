@@ -1,14 +1,53 @@
+macro_rules! ListOf {
+    () => {
+        $crate::types::list::Nil
+    };
+    (..$rest:ty) => {
+        $rest
+    };
+    ($item:ty) => {
+        $crate::types::list::ListOf![$item,]
+    };
+    ($item:ty, $($items:tt)*) => {
+        $crate::types::list::Cons<$item, $crate::types::list::ListOf![$($items)*]>
+    };
+}
+
+pub(crate) use ListOf;
+
 macro_rules! list {
     () => {
         $crate::types::list::Nil
     };
-    ($item:expr) => { $crate::types::list::list![$item,] };
-    ($item:expr, $($rest:tt)*) => {
-        $crate::types::list::Cons($item, $crate::types::list::list![$($rest)*])
+    (..$rest:expr) => {
+        $rest
+    };
+    ($item:expr) => {
+        $crate::types::list::list![$item,]
+    };
+    ($item:expr, $($items:tt)*) => {
+        $crate::types::list::Cons($item, $crate::types::list::list![$($items)*])
     };
 }
 
 pub(crate) use list;
+
+macro_rules! ListPat {
+    () => {
+        $crate::types::list::Nil
+    };
+    (..$rest:pat) => {
+        $rest
+    };
+    ($item:pat) => {
+        $crate::types::list::ListPat![$item,]
+    };
+    ($item:pat, $($items:tt)*) => {
+        $crate::types::list::Cons($item, $crate::types::list::ListPat![$($items)*])
+    };
+}
+
+pub(crate) use ListPat;
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)

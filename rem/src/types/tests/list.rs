@@ -1,4 +1,4 @@
-use crate::types::list::{list, Cons, List};
+use crate::types::list::{list, List, ListPat};
 
 #[test]
 fn describe_list_len_it_works() {
@@ -26,10 +26,11 @@ fn describe_list_eq_it_returns_false_on_mismatch() {
 }
 
 #[test]
-fn describe_list_pattern_matching_it_works() {
-    let Cons(item, rest) = list![1, true, "three"];
-    assert_eq!(item, 1);
-    assert_eq!(rest, list![true, "three"]);
+fn describe_list_pat_it_works() {
+    let ListPat![item1, item2, ..rest] = list![1, true, "three", '4'];
+    assert_eq!(item1, 1);
+    assert_eq!(item2, true);
+    assert_eq!(rest, list!["three", '4']);
 }
 
 #[test]

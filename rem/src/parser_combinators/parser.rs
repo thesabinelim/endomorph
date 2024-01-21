@@ -1,5 +1,6 @@
-use super::{ParseError, ParseSuccess, Parser, TokenStream, TokenStreamError};
 use std::fmt::{Debug, Display};
+
+use super::{ParseError, ParseSuccess, Parser, TokenStream, TokenStreamError};
 
 #[derive(Clone, PartialEq)]
 pub struct Eof;
