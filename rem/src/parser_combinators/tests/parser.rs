@@ -30,7 +30,7 @@ fn describe_single_it_errors_on_mismatch() {
     assert_eq!(
         Single('a').parse("b"),
         Err(ParseError {
-            expected: 'a'.to_string(),
+            expected: "a".to_string(),
             recoverable: true,
             inner_error: SingleError::Mismatch
         })
@@ -42,7 +42,7 @@ fn describe_single_it_errors_on_eof() {
     assert_eq!(
         Single('a').parse(""),
         Err(ParseError {
-            expected: 'a'.to_string(),
+            expected: "a".to_string(),
             recoverable: true,
             inner_error: SingleError::Eof
         })
