@@ -4,10 +4,20 @@ use super::{ParseError, ParseSuccess, Parser, ParserList, TokenStream};
 use crate::types::list::{list, List, ListOf, ListPat};
 
 #[derive(Clone, PartialEq)]
-pub struct Choice<Input, Parsers>(pub Parsers, pub PhantomData<Input>)
+pub struct Choice<Input, Parsers>(Parsers, PhantomData<Input>)
 where
     Input: TokenStream,
     Parsers: ParserList<Input>;
+
+impl<Input, Parsers> Choice<Input, Parsers>
+where
+    Input: TokenStream,
+    Parsers: ParserList<Input>,
+{
+    pub fn of(parsers: Parsers) -> Choice<Input, Parsers> {
+        Choice(parsers, PhantomData)
+    }
+}
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum ChoiceError {
@@ -20,22 +30,19 @@ where
     Input: TokenStream,
     Item: Parser<Input>,
     NextItem: Parser<Input>,
+    NextItem::Output: List,
     Rest: ParserList<Input>,
     Choice<Input, ListOf![NextItem, ..Rest]>: Parser<Input>,
-    <NextItem as Parser<Input>>::Output: List,
 {
-    type Output = ListOf![
-        <Item as Parser<Input>>::Output,
-        ..<NextItem as Parser<Input>>::Output
-    ];
+    type Output = ListOf![Item::Output, ..NextItem::Output];
     type Error = ChoiceError;
 
     fn parse(
         &self,
         input: Input,
     ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
-        let Choice(between, _) = self;
-        let ListPat![parser, ..rest] = between;
+        let of = self.0;
+        let ListPat![parser, ..rest] = of;
         match parser.parse(input.clone()) {
             Ok(result) => Ok(list![result]),
             Err(ParseError {
@@ -44,7 +51,7 @@ where
                 inner_error: _,
             }) => {
                 if recoverable {
-                    match Choice(rest.clone(), PhantomData).parse(input) {
+                    match Choice::of(rest.clone()).parse(input) {
                         Ok(result) => Ok(result),
                         Err(error) => Err(ParseError {
                             expected: expected,
@@ -69,15 +76,15 @@ where
     Input: TokenStream,
     Item: Parser<Input>,
 {
-    type Output = <Item as Parser<Input>>::Output;
+    type Output = Item::Output;
     type Error = ChoiceError;
 
     fn parse(
         &self,
         input: Input,
     ) -> Result<ParseSuccess<Self::Output, Input>, ParseError<Self::Error>> {
-        let Choice(between, _) = self;
-        let ListPat![parser, .._] = between;
+        let of = self.0;
+        let ListPat![parser, .._] = of;
         match parser.parse(input) {
             Ok(result) => Ok(result),
             Err(ParseError {

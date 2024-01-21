@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use crate::{
     parser_combinators::{
         combinator::{Choice, ChoiceError},
@@ -11,7 +9,7 @@ use crate::{
 
 #[test]
 fn describe_choice_it_works() {
-    let parser = Choice(list![Single('a'), Single('b'), Single('c')], PhantomData);
+    let parser = Choice::of(list![Single('a'), Single('b'), Single('c')]);
     assert_eq!(parser.parse("a"), Ok(('a', "")));
     assert_eq!(parser.parse("b"), Ok(('b', "")));
     assert_eq!(parser.parse("c"), Ok(('c', "")));
@@ -19,7 +17,7 @@ fn describe_choice_it_works() {
 
 #[test]
 fn describe_choice_it_errors_on_all_inner_parser_error() {
-    let parser = Choice(list![Single('a'), Single('b'), Single('c')], PhantomData);
+    let parser = Choice::of(list![Single('a'), Single('b'), Single('c')]);
     assert_eq!(
         parser.parse("d"),
         Err(ParseError {
@@ -32,7 +30,7 @@ fn describe_choice_it_errors_on_all_inner_parser_error() {
 
 #[test]
 fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Choice(list![Single('a'), Single('b'), Single('c')], PhantomData);
+    let parser = Choice::of(list![Single('a'), Single('b'), Single('c')]);
     assert_eq!(
         parser.parse("d"),
         Err(ParseError {
