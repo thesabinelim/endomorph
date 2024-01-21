@@ -74,8 +74,6 @@ where
     }
 }
 
-impl Nil {}
-
 impl List for Nil {
     const LEN: usize = 0;
 
