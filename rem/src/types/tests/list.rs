@@ -16,9 +16,14 @@ fn describe_list_eq_it_returns_false_on_mismatch() {
 }
 
 #[test]
-fn describe_list_rest_initialisation_works() {
-    let rest = list![true, "three"];
-    assert_eq!(list![1, ..rest], list![1, true, "three"]);
+fn describe_list_spread_initialisation_works() {
+    let list1 = list![1];
+    let list2 = list!["three", '4'];
+    let list3 = list![5.0];
+    assert_eq!(
+        list![..list1, true, ..list2, ..list3],
+        list![1, true, "three", '4', 5.0]
+    );
 }
 
 #[test]
@@ -50,4 +55,25 @@ fn describe_list_append_it_works() {
 #[test]
 fn describe_list_append_it_works_when_empty() {
     assert_eq!(list![].append(1), list![1]);
+}
+
+#[test]
+fn describe_list_concat_it_works() {
+    assert_eq!(
+        list![1, true].concat(list!["three", '4']),
+        list![1, true, "three", '4']
+    );
+}
+
+#[test]
+fn describe_list_concat_it_works_when_empty() {
+    assert_eq!(
+        list![].concat(list![1, true, "three"]),
+        list![1, true, "three"]
+    );
+}
+
+#[test]
+fn describe_list_concat_it_works_when_both_empty() {
+    assert_eq!(list![].concat(list![]), list![]);
 }

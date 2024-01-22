@@ -19,14 +19,17 @@ macro_rules! list {
     () => {
         $crate::types::list::Nil
     };
-    (..$rest:expr) => {
-        $rest
+    (..$list:expr) => {
+        $list
     };
     ($item:expr) => {
         $crate::types::list::list![$item,]
     };
-    ($item:expr, $($items:tt)*) => {
-        $crate::types::list::Cons($item, $crate::types::list::list![$($items)*])
+    (..$list:expr, $($rest:tt)*) => {
+        $list.concat($crate::types::list::list![$($rest)*])
+    };
+    ($item:expr, $($rest:tt)*) => {
+        $crate::types::list::Cons($item, $crate::types::list::list![$($rest)*])
     };
 }
 
@@ -76,6 +79,14 @@ pub trait List: Clone + PartialEq {
     fn append<T>(&self, item: T) -> Self::AppendResult<T>
     where
         T: Clone + PartialEq;
+
+    type ConcatResult<T>: List
+    where
+        T: List;
+
+    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    where
+        T: List;
 }
 
 impl<Item, Rest> ListCons for Cons<Item, Rest>
@@ -103,6 +114,18 @@ where
         let Cons(self_item, rest) = self;
         Cons(self_item.clone(), rest.append(item))
     }
+
+    type ConcatResult<T> = Cons<Item, Rest::ConcatResult<T>>
+    where
+        T: List;
+
+    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    where
+        T: List,
+    {
+        let Cons(item, rest) = self;
+        Cons(item.clone(), rest.concat(list))
+    }
 }
 
 impl ListNil for Nil {}
@@ -119,5 +142,16 @@ impl List for Nil {
         T: Clone + PartialEq,
     {
         Cons(item, Nil)
+    }
+
+    type ConcatResult<T> = T
+    where
+        T: List;
+
+    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    where
+        T: List,
+    {
+        list
     }
 }
