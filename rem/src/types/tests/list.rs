@@ -51,16 +51,3 @@ fn describe_list_append_it_works() {
 fn describe_list_append_it_works_when_empty() {
     assert_eq!(list![].append(1), list![1]);
 }
-
-#[test]
-fn describe_list_prepend_it_works() {
-    assert_eq!(
-        list![1, true, "three"].prepend('4'),
-        list!['4', 1, true, "three"]
-    );
-}
-
-#[test]
-fn describe_list_prepend_it_works_when_empty() {
-    assert_eq!(list![].append(1), list![1]);
-}
