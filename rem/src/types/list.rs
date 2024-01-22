@@ -55,20 +55,25 @@ macro_rules! ListPat {
 
 pub(crate) use ListPat;
 
-pub trait NonEmptyList: List {
-    type Item;
-    type Rest: List;
-}
-
 #[derive(Clone, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)
 where
     Rest: List;
 
-pub trait EmptyList: List {}
-
 #[derive(Clone, PartialEq, Debug)]
 pub struct Nil;
+
+pub trait NonEmptyList: List {
+    type Item;
+    type LastItem;
+    type Rest: List;
+
+    type WithoutLastItem: List;
+
+    fn pop(self) -> (Self::LastItem, Self::WithoutLastItem);
+}
+
+pub trait EmptyList: List {}
 
 pub trait List {
     const LEN: usize;
@@ -89,17 +94,39 @@ pub trait List {
     where
         T: List;
 
-    type ReverseResult: List;
+    type Reversed: List;
 
-    fn reverse(self) -> Self::ReverseResult;
+    fn reverse(self) -> Self::Reversed;
 }
 
 impl<Item, Rest> NonEmptyList for Cons<Item, Rest>
 where
-    Rest: List,
+    Rest: NonEmptyList,
 {
     type Item = Item;
+    type LastItem = Rest::LastItem;
     type Rest = Rest;
+
+    type WithoutLastItem = Cons<Item, Rest::WithoutLastItem>;
+
+    fn pop(self) -> (Self::LastItem, Self::WithoutLastItem) {
+        let Cons(item, rest) = self;
+        let (last, without_last) = rest.pop();
+        (last, Cons(item, without_last))
+    }
+}
+
+impl<Item> NonEmptyList for Cons<Item, Nil> {
+    type Item = Item;
+    type LastItem = Item;
+    type Rest = Nil;
+
+    type WithoutLastItem = Nil;
+
+    fn pop(self) -> (Self::LastItem, Self::WithoutLastItem) {
+        let Cons(item, Nil) = self;
+        (item, Nil)
+    }
 }
 
 impl<Item, Rest> List for Cons<Item, Rest>
@@ -127,9 +154,9 @@ where
         Cons(item, rest.concat(list))
     }
 
-    type ReverseResult = <Rest::ReverseResult as List>::AppendResult<Item>;
+    type Reversed = <Rest::Reversed as List>::AppendResult<Item>;
 
-    fn reverse(self) -> Self::ReverseResult {
+    fn reverse(self) -> Self::Reversed {
         let Cons(item, rest) = self;
         rest.reverse().append(item)
     }
@@ -157,9 +184,9 @@ impl List for Nil {
         list
     }
 
-    type ReverseResult = Nil;
+    type Reversed = Self;
 
-    fn reverse(self) -> Self::ReverseResult {
+    fn reverse(self) -> Self::Reversed {
         self
     }
 }

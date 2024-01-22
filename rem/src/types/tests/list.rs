@@ -1,4 +1,4 @@
-use crate::types::list::{list, List, ListOf, ListPat};
+use crate::types::list::{list, List, ListOf, ListPat, NonEmptyList};
 
 #[test]
 fn describe_list_eq_it_returns_true_when_both_empty() {
@@ -59,6 +59,16 @@ fn describe_list_pat_it_works() {
     assert_eq!(item1, 1);
     assert_eq!(item2, true);
     assert_eq!(rest, list!["three", '4']);
+}
+
+#[test]
+fn describe_list_pop_it_works() {
+    assert_eq!(list![1, true, "three"].pop(), ("three", list![1, true]));
+}
+
+#[test]
+fn describe_list_pop_it_works_with_only_one_item() {
+    assert_eq!(list![1].pop(), (1, list![]));
 }
 
 #[test]
