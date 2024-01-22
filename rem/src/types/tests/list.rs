@@ -1,4 +1,4 @@
-use crate::types::list::{list, List, ListPat};
+use crate::types::list::{list, List, ListOf, ListPat};
 
 #[test]
 fn describe_list_eq_it_returns_true_when_both_empty() {
@@ -16,7 +16,7 @@ fn describe_list_eq_it_returns_false_on_mismatch() {
 }
 
 #[test]
-fn describe_list_spread_initialisation_works() {
+fn describe_list_spread_initialisation_it_works() {
     let list1 = list![1];
     let list2 = list!["three", '4'];
     let list3 = list![5.0];
@@ -24,6 +24,14 @@ fn describe_list_spread_initialisation_works() {
         list![..list1, true, ..list2, ..list3],
         list![1, true, "three", '4', 5.0]
     );
+}
+
+#[test]
+fn describe_list_of_it_works() {
+    type List1 = ListOf![i32];
+    type List2<'a> = ListOf![&'a str, char];
+    type List3 = ListOf![f64];
+    let _list: ListOf![..List1, bool, ..List2, ..List3] = list![1, true, "three", '4', 5.0];
 }
 
 #[test]

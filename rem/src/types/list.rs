@@ -2,14 +2,17 @@ macro_rules! ListOf {
     () => {
         $crate::types::list::Nil
     };
-    (..$rest:ty) => {
-        $rest
+    (..$list:ty) => {
+        $list
     };
     ($item:ty) => {
         $crate::types::list::ListOf![$item,]
     };
-    ($item:ty, $($items:tt)*) => {
-        $crate::types::list::Cons<$item, $crate::types::list::ListOf![$($items)*]>
+    (..$list:ty, $($rest:tt)*) => {
+        <$list as List>::ConcatResult<$crate::types::list::ListOf![$($rest)*]>
+    };
+    ($item:ty, $($rest:tt)*) => {
+        $crate::types::list::Cons<$item, $crate::types::list::ListOf![$($rest)*]>
     };
 }
 
@@ -39,20 +42,23 @@ macro_rules! ListPat {
     () => {
         $crate::types::list::Nil
     };
-    (..$rest:pat) => {
-        $rest
+    (..$list:pat) => {
+        $list
     };
     ($item:pat) => {
         $crate::types::list::ListPat![$item,]
     };
-    ($item:pat, $($items:tt)*) => {
-        $crate::types::list::Cons($item, $crate::types::list::ListPat![$($items)*])
+    ($item:pat, $($rest:tt)*) => {
+        $crate::types::list::Cons($item, $crate::types::list::ListPat![$($rest)*])
     };
 }
 
 pub(crate) use ListPat;
 
-pub trait ListCons: List {}
+pub trait ListCons: List {
+    type Item: Clone + PartialEq;
+    type Rest: List;
+}
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)
@@ -94,6 +100,8 @@ where
     Item: Clone + PartialEq,
     Rest: List,
 {
+    type Item = Item;
+    type Rest = Rest;
 }
 
 impl<Item, Rest> List for Cons<Item, Rest>
