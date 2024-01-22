@@ -92,7 +92,6 @@ pub trait List {
 
 impl<Item, Rest> ListCons for Cons<Item, Rest>
 where
-    Item: Clone + PartialEq,
     Rest: List,
 {
     type Item = Item;
