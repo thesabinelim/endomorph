@@ -1,6 +1,12 @@
 use crate::types::list::{list, List, ListPat};
 
 #[test]
+fn describe_list_rest_initialisation_works() {
+    let rest = list![true, "three"];
+    assert_eq!(list![1, ..rest], list![1, true, "three"]);
+}
+
+#[test]
 fn describe_list_len_it_works() {
     assert_eq!(list![1, true, "three"].len(), 3);
 }

@@ -76,14 +76,6 @@ pub trait List: Clone + PartialEq {
     fn append<T>(&self, item: T) -> Self::AppendResult<T>
     where
         T: Clone + PartialEq;
-
-    type PrependResult<T>: List
-    where
-        T: Clone + PartialEq;
-
-    fn prepend<T>(&self, item: T) -> Self::PrependResult<T>
-    where
-        T: Clone + PartialEq;
 }
 
 impl<Item, Rest> ListCons for Cons<Item, Rest>
@@ -111,17 +103,6 @@ where
         let Cons(self_item, rest) = self;
         Cons(self_item.clone(), rest.append(item))
     }
-
-    type PrependResult<T> = Cons<T, Self>
-    where
-        T: Clone + PartialEq;
-
-    fn prepend<T>(&self, item: T) -> Self::PrependResult<T>
-    where
-        T: Clone + PartialEq,
-    {
-        Cons(item, self.clone())
-    }
 }
 
 impl ListNil for Nil {}
@@ -134,17 +115,6 @@ impl List for Nil {
         T: Clone + PartialEq;
 
     fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone + PartialEq,
-    {
-        Cons(item, Nil)
-    }
-
-    type PrependResult<T> = Cons<T, Self>
-    where
-        T: Clone + PartialEq;
-
-    fn prepend<T>(&self, item: T) -> Self::PrependResult<T>
     where
         T: Clone + PartialEq,
     {
