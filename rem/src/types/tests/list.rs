@@ -28,10 +28,19 @@ fn describe_list_spread_initialisation_it_works() {
 
 #[test]
 fn describe_list_of_it_works() {
+    type EmptyList = ListOf![];
     type List1 = ListOf![i32];
     type List2<'a> = ListOf![&'a str, char];
     type List3 = ListOf![f64];
-    let _list: ListOf![..List1, bool, ..List2, ..List3] = list![1, true, "three", '4', 5.0];
+    let _list: ListOf![
+        ..EmptyList,
+        ..List1,
+        ..EmptyList,
+        bool,
+        ..List2,
+        ..EmptyList,
+        ..List3
+    ] = list![1, true, "three", '4', 5.0];
 }
 
 #[test]
