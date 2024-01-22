@@ -88,6 +88,10 @@ pub trait List {
     fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List;
+
+    type ReverseResult: List;
+
+    fn reverse(self) -> Self::ReverseResult;
 }
 
 impl<Item, Rest> ListCons for Cons<Item, Rest>
@@ -122,6 +126,13 @@ where
         let Cons(item, rest) = self;
         Cons(item, rest.concat(list))
     }
+
+    type ReverseResult = <Rest::ReverseResult as List>::AppendResult<Item>;
+
+    fn reverse(self) -> Self::ReverseResult {
+        let Cons(item, rest) = self;
+        rest.reverse().append(item)
+    }
 }
 
 impl ListNil for Nil {}
@@ -144,5 +155,11 @@ impl List for Nil {
         T: List,
     {
         list
+    }
+
+    type ReverseResult = Nil;
+
+    fn reverse(self) -> Self::ReverseResult {
+        self
     }
 }

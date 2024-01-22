@@ -85,3 +85,13 @@ fn describe_list_concat_it_works_when_empty() {
 fn describe_list_concat_it_works_when_both_empty() {
     assert_eq!(list![].concat(list![]), list![]);
 }
+
+#[test]
+fn describe_list_reverse_it_works() {
+    assert_eq!(list![1, true, "three"].reverse(), list!["three", true, 1]);
+}
+
+#[test]
+fn describe_list_reverse_it_works_when_empty() {
+    assert_eq!(list![], list![]);
+}
