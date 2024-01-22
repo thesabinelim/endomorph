@@ -1,6 +1,21 @@
 use crate::types::list::{list, List, ListPat};
 
 #[test]
+fn describe_list_eq_it_returns_true_when_both_empty() {
+    assert_eq!(list![], list![]);
+}
+
+#[test]
+fn describe_list_eq_it_returns_true_on_match() {
+    assert_eq!(list![1, true, "three"], list![1, true, "three"]);
+}
+
+#[test]
+fn describe_list_eq_it_returns_false_on_mismatch() {
+    assert_ne!(list![1, true, "three"], list![1, true, "mismatch"]);
+}
+
+#[test]
 fn describe_list_rest_initialisation_works() {
     let rest = list![true, "three"];
     assert_eq!(list![1, ..rest], list![1, true, "three"]);
@@ -14,21 +29,6 @@ fn describe_list_len_it_works() {
 #[test]
 fn describe_list_len_it_returns_zero_when_empty() {
     assert_eq!(list![].len(), 0);
-}
-
-#[test]
-fn describe_list_eq_it_returns_true_when_both_empty() {
-    assert_eq!(list![], list![]);
-}
-
-#[test]
-fn describe_list_eq_it_returns_true_on_match() {
-    assert_eq!(list![1, true, "three"], list![1, true, "three"]);
-}
-
-#[test]
-fn describe_list_eq_it_returns_false_on_mismatch() {
-    assert_ne!(list![1, true, "three"], list![1, true, "mismatch"]);
 }
 
 #[test]
