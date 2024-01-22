@@ -55,7 +55,7 @@ macro_rules! ListPat {
 
 pub(crate) use ListPat;
 
-pub trait ListCons: List {
+pub trait NonEmptyList: List {
     type Item;
     type Rest: List;
 }
@@ -65,7 +65,7 @@ pub struct Cons<Item, Rest>(pub Item, pub Rest)
 where
     Rest: List;
 
-pub trait ListNil: List {}
+pub trait EmptyList: List {}
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Nil;
@@ -94,7 +94,7 @@ pub trait List {
     fn reverse(self) -> Self::ReverseResult;
 }
 
-impl<Item, Rest> ListCons for Cons<Item, Rest>
+impl<Item, Rest> NonEmptyList for Cons<Item, Rest>
 where
     Rest: List,
 {
@@ -135,7 +135,7 @@ where
     }
 }
 
-impl ListNil for Nil {}
+impl EmptyList for Nil {}
 
 impl List for Nil {
     const LEN: usize = 0;

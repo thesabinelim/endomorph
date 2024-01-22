@@ -2,18 +2,18 @@ use core::fmt::Debug;
 use core::marker::PhantomData;
 
 use super::{LikeParserList, ParseError, Parser, TokenStream};
-use crate::types::list::{ListCons, ListOf, ListPat};
+use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
 #[derive(Clone, PartialEq)]
 pub struct Choice<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
 where
     Input: TokenStream,
-    Parsers: LikeParserList<Input, Output>;
+    Parsers: LikeParserList<Input, Output> + NonEmptyList;
 
 impl<Input, Output, Parsers> Choice<Input, Output, Parsers>
 where
     Input: TokenStream,
-    Parsers: LikeParserList<Input, Output>,
+    Parsers: LikeParserList<Input, Output> + NonEmptyList,
 {
     pub fn of(parsers: Parsers) -> Self {
         Choice(parsers, PhantomData, PhantomData)
@@ -31,7 +31,7 @@ where
     Input: TokenStream,
     Output: Clone + PartialEq + Debug,
     Item: Parser<Input, Output = Output>,
-    Rest: LikeParserList<Input, Output> + ListCons,
+    Rest: LikeParserList<Input, Output> + NonEmptyList,
     Choice<Input, Output, Rest>: Parser<Input, Output = Output>,
 {
     type Output = Output;
@@ -164,12 +164,12 @@ where
 pub struct Sequence<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
 where
     Input: TokenStream,
-    Parsers: LikeParserList<Input, Output>;
+    Parsers: LikeParserList<Input, Output> + NonEmptyList;
 
 impl<Input, Output, Parsers> Sequence<Input, Output, Parsers>
 where
     Input: TokenStream,
-    Parsers: LikeParserList<Input, Output>,
+    Parsers: LikeParserList<Input, Output> + NonEmptyList,
 {
     pub fn of(parsers: Parsers) -> Self {
         Sequence(parsers, PhantomData, PhantomData)
@@ -187,7 +187,7 @@ where
     Input: TokenStream,
     Output: Clone + PartialEq + Debug,
     Item: Parser<Input, Output = Output>,
-    Rest: LikeParserList<Input, Output> + ListCons,
+    Rest: LikeParserList<Input, Output> + NonEmptyList,
     Sequence<Input, Output, Rest>: Parser<Input, Output = Vec<Output>>,
 {
     type Output = Vec<Output>;
