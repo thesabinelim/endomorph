@@ -56,14 +56,13 @@ macro_rules! ListPat {
 pub(crate) use ListPat;
 
 pub trait ListCons: List {
-    type Item: Clone + PartialEq;
+    type Item;
     type Rest: List;
 }
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)
 where
-    Item: Clone + PartialEq,
     Rest: List;
 
 pub trait ListNil: List {}
@@ -71,26 +70,22 @@ pub trait ListNil: List {}
 #[derive(Clone, PartialEq, Debug)]
 pub struct Nil;
 
-pub trait List: Clone + PartialEq {
+pub trait List {
     const LEN: usize;
 
     fn len(&self) -> usize {
         Self::LEN
     }
 
-    type AppendResult<T>: List
-    where
-        T: Clone + PartialEq;
+    type AppendResult<T>: List;
 
-    fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone + PartialEq;
+    fn append<T>(self, item: T) -> Self::AppendResult<T>;
 
     type ConcatResult<T>: List
     where
         T: List;
 
-    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List;
 }
@@ -106,33 +101,27 @@ where
 
 impl<Item, Rest> List for Cons<Item, Rest>
 where
-    Item: Clone + PartialEq,
     Rest: List,
 {
     const LEN: usize = Rest::LEN + 1;
 
-    type AppendResult<T> = Cons<Item, Rest::AppendResult<T>>
-    where
-        T: Clone + PartialEq;
+    type AppendResult<T> = Cons<Item, Rest::AppendResult<T>>;
 
-    fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone + PartialEq,
-    {
+    fn append<T>(self, item: T) -> Self::AppendResult<T> {
         let Cons(self_item, rest) = self;
-        Cons(self_item.clone(), rest.append(item))
+        Cons(self_item, rest.append(item))
     }
 
     type ConcatResult<T> = Cons<Item, Rest::ConcatResult<T>>
     where
         T: List;
 
-    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List,
     {
         let Cons(item, rest) = self;
-        Cons(item.clone(), rest.concat(list))
+        Cons(item, rest.concat(list))
     }
 }
 
@@ -141,14 +130,9 @@ impl ListNil for Nil {}
 impl List for Nil {
     const LEN: usize = 0;
 
-    type AppendResult<T> = Cons<T, Self>
-    where
-        T: Clone + PartialEq;
+    type AppendResult<T> = Cons<T, Self>;
 
-    fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone + PartialEq,
-    {
+    fn append<T>(self, item: T) -> Self::AppendResult<T> {
         Cons(item, Nil)
     }
 
@@ -156,7 +140,7 @@ impl List for Nil {
     where
         T: List;
 
-    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List,
     {

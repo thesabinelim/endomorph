@@ -24,7 +24,7 @@ pub struct ParseError<Error> {
     pub inner_error: Error,
 }
 
-pub trait ParserList<Input>: List {}
+pub trait ParserList<Input>: List + Clone + PartialEq {}
 
 impl<Input, Item, Rest> ParserList<Input> for ListOf![Item, ..Rest]
 where
