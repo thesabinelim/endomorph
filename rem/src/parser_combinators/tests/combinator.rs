@@ -1,6 +1,6 @@
 use crate::{
     parser_combinators::{
-        combinator::{Choice, ChoiceError, Sequence, SequenceError, Unrecoverable},
+        combinator::{Or, OrError, Sequence, SequenceError, Unrecoverable},
         parser::{Single, SingleError},
         ParseError, Parser,
     },
@@ -8,29 +8,29 @@ use crate::{
 };
 
 #[test]
-fn describe_choice_it_works() {
-    let parser = Choice::of(list![Single('a'), Single('b'), Single('c')]);
+fn describe_or_it_works() {
+    let parser = Or::of(list![Single('a'), Single('b'), Single('c')]);
     assert_eq!(parser.parse("a"), Ok(('a', "")));
     assert_eq!(parser.parse("b"), Ok(('b', "")));
     assert_eq!(parser.parse("c"), Ok(('c', "")));
 }
 
 #[test]
-fn describe_choice_it_errors_on_all_inner_parser_error() {
-    let parser = Choice::of(list![Single('a'), Single('b'), Single('c')]);
+fn describe_or_it_errors_on_all_inner_parser_error() {
+    let parser = Or::of(list![Single('a'), Single('b'), Single('c')]);
     assert_eq!(
         parser.parse("d"),
         Err(ParseError {
             expected: "a or b or c".to_string(),
             recoverable: true,
-            inner_error: ChoiceError::AllFailed
+            inner_error: OrError::AllFailed
         })
     );
 }
 
 #[test]
-fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Choice::of(list![
+fn describe_or_it_errors_on_inner_parser_unrecoverable_error() {
+    let parser = Or::of(list![
         Single('a'),
         Unrecoverable::of(Single('b')),
         Single('c')
@@ -40,7 +40,7 @@ fn describe_choice_it_errors_on_inner_parser_unrecoverable_error() {
         Err(ParseError {
             expected: "b".to_string(),
             recoverable: false,
-            inner_error: ChoiceError::Unrecoverable
+            inner_error: OrError::Unrecoverable
         })
     );
 }

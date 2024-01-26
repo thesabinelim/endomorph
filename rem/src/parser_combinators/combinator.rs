@@ -5,42 +5,42 @@ use super::{LikeParserList, ParseError, Parser, TokenStream};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
 #[derive(Clone, PartialEq)]
-pub struct Choice<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
+pub struct Or<Input, Output, Parsers>(Parsers, PhantomData<Input>, PhantomData<Output>)
 where
     Input: TokenStream,
     Parsers: LikeParserList<Input, Output> + NonEmptyList;
 
-impl<Input, Output, Parsers> Choice<Input, Output, Parsers>
+impl<Input, Output, Parsers> Or<Input, Output, Parsers>
 where
     Input: TokenStream,
     Parsers: LikeParserList<Input, Output> + NonEmptyList,
 {
     pub fn of(parsers: Parsers) -> Self {
-        Choice(parsers, PhantomData, PhantomData)
+        Or(parsers, PhantomData, PhantomData)
     }
 }
 
 #[derive(Debug, Eq, PartialEq)]
-pub enum ChoiceError {
+pub enum OrError {
     AllFailed,
     Unrecoverable,
 }
 
-impl<Input, Output, Item, Rest> Parser<Input> for Choice<Input, Output, ListOf![Item, ..Rest]>
+impl<Input, Output, Item, Rest> Parser<Input> for Or<Input, Output, ListOf![Item, ..Rest]>
 where
     Input: TokenStream,
     Output: Clone + PartialEq + Debug,
     Item: Parser<Input, Output = Output>,
     Rest: LikeParserList<Input, Output> + NonEmptyList,
-    Choice<Input, Output, Rest>: Parser<Input, Output = Output>,
+    Or<Input, Output, Rest>: Parser<Input, Output = Output>,
 {
     type Output = Output;
-    type Error = ChoiceError;
+    type Error = OrError;
 
     fn expected(&self) -> String {
         let ListPat![parser, ..rest] = &self.0;
         let expected = parser.expected();
-        let rest_expected = Choice::of(rest.clone()).expected();
+        let rest_expected = Or::of(rest.clone()).expected();
         format!("{} or {}", expected, rest_expected)
     }
 
@@ -54,7 +54,7 @@ where
                 inner_error: _,
             }) => {
                 if recoverable {
-                    match Choice::of(rest.clone()).parse(input) {
+                    match Or::of(rest.clone()).parse(input) {
                         Ok(result) => Ok(result),
                         Err(ParseError {
                             expected,
@@ -64,13 +64,13 @@ where
                             ParseError {
                                 expected: self.expected(),
                                 recoverable,
-                                inner_error: ChoiceError::AllFailed,
+                                inner_error: OrError::AllFailed,
                             }
                         } else {
                             ParseError {
                                 expected,
                                 recoverable,
-                                inner_error: ChoiceError::Unrecoverable,
+                                inner_error: OrError::Unrecoverable,
                             }
                         }),
                     }
@@ -78,7 +78,7 @@ where
                     Err(ParseError {
                         expected,
                         recoverable,
-                        inner_error: ChoiceError::Unrecoverable,
+                        inner_error: OrError::Unrecoverable,
                     })
                 }
             }
@@ -86,14 +86,14 @@ where
     }
 }
 
-impl<Input, Output, Item> Parser<Input> for Choice<Input, Output, ListOf![Item]>
+impl<Input, Output, Item> Parser<Input> for Or<Input, Output, ListOf![Item]>
 where
     Input: TokenStream,
     Output: Clone + PartialEq + Debug,
     Item: Parser<Input, Output = Output>,
 {
     type Output = Output;
-    type Error = ChoiceError;
+    type Error = OrError;
 
     fn expected(&self) -> String {
         let ListPat![parser, .._] = &self.0;
@@ -112,13 +112,13 @@ where
                 ParseError {
                     expected: self.expected(),
                     recoverable,
-                    inner_error: ChoiceError::AllFailed,
+                    inner_error: OrError::AllFailed,
                 }
             } else {
                 ParseError {
                     expected,
                     recoverable,
-                    inner_error: ChoiceError::Unrecoverable,
+                    inner_error: OrError::Unrecoverable,
                 }
             }),
         }
