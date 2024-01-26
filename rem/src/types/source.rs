@@ -1,14 +1,15 @@
-pub struct Source {
-    pub file: String,
-    pub text: String,
+use std::path::PathBuf;
+
+#[derive(Clone)]
+pub enum Source {
+    File(PathBuf),
+    Stdin,
 }
 
-pub struct SourceError {
-    pub offset: usize,
-    pub message: String,
+pub struct Span {
+    pub source: Source,
+    pub start: Offset,
+    pub end: Offset,
 }
 
-pub struct SourcePosition {
-    pub line: usize,
-    pub col: usize,
-}
+pub type Offset = usize;
