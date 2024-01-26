@@ -1,5 +1,5 @@
 use crate::parser_combinators::{
-    parser::{Eof, EofError, Single, SingleError},
+    parser::{Eof, EofError, Just, JustError},
     ParseError, Parser,
 };
 
@@ -20,28 +20,28 @@ fn describe_eof_it_errors_on_not_eof() {
 }
 
 #[test]
-fn describe_single_it_works() {
-    assert_eq!(Single('a').parse("a"), Ok(('a', "")));
+fn describe_just_it_works() {
+    assert_eq!(Just('a').parse("a"), Ok(('a', "")));
 }
 
 #[test]
-fn describe_single_it_errors_on_mismatch() {
+fn describe_just_it_errors_on_mismatch() {
     assert_eq!(
-        Single('a').parse("b"),
+        Just('a').parse("b"),
         Err(ParseError {
             recoverable: true,
-            inner_error: SingleError::Mismatch
+            inner_error: JustError::Mismatch
         })
     );
 }
 
 #[test]
-fn describe_single_it_errors_on_eof() {
+fn describe_just_it_errors_on_eof() {
     assert_eq!(
-        Single('a').parse(""),
+        Just('a').parse(""),
         Err(ParseError {
             recoverable: true,
-            inner_error: SingleError::Eof
+            inner_error: JustError::Eof
         })
     );
 }

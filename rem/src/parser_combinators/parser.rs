@@ -29,24 +29,24 @@ where
 }
 
 #[derive(Clone, PartialEq)]
-pub struct Single<Token>(pub Token);
+pub struct Just<Token>(pub Token);
 
 #[derive(Debug, Eq, PartialEq)]
-pub enum SingleError {
+pub enum JustError {
     Mismatch,
     Eof,
 }
 
-impl<Input> Parser<Input> for Single<Input::Token>
+impl<Input> Parser<Input> for Just<Input::Token>
 where
     Input: TokenStream,
     Input::Token: Clone + Display + Eq + Debug,
 {
     type Output = Input::Token;
-    type Error = SingleError;
+    type Error = JustError;
 
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
-        let Single(expected) = self;
+        let Just(expected) = self;
         match input.next() {
             Ok((actual, rest)) => {
                 if actual == *expected {
@@ -54,13 +54,13 @@ where
                 } else {
                     Err(ParseError {
                         recoverable: true,
-                        inner_error: SingleError::Mismatch,
+                        inner_error: JustError::Mismatch,
                     })
                 }
             }
             Err(TokenStreamError::Eof) => Err(ParseError {
                 recoverable: true,
-                inner_error: SingleError::Eof,
+                inner_error: JustError::Eof,
             }),
         }
     }

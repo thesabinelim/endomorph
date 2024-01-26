@@ -1,7 +1,7 @@
 use crate::{
     parser_combinators::{
         combinator::{Or, OrError, Sequence, SequenceError, Unrecoverable},
-        parser::{Single, SingleError},
+        parser::{Just, JustError},
         ParseError, Parser,
     },
     types::list::list,
@@ -9,7 +9,7 @@ use crate::{
 
 #[test]
 fn describe_or_it_works() {
-    let parser = Or::of(list![Single('a'), Single('b'), Single('c')]);
+    let parser = Or::of(list![Just('a'), Just('b'), Just('c')]);
     assert_eq!(parser.parse("a"), Ok(('a', "")));
     assert_eq!(parser.parse("b"), Ok(('b', "")));
     assert_eq!(parser.parse("c"), Ok(('c', "")));
@@ -17,7 +17,7 @@ fn describe_or_it_works() {
 
 #[test]
 fn describe_or_it_errors_on_all_inner_parser_error() {
-    let parser = Or::of(list![Single('a'), Single('b'), Single('c')]);
+    let parser = Or::of(list![Just('a'), Just('b'), Just('c')]);
     assert_eq!(
         parser.parse("d"),
         Err(ParseError {
@@ -29,11 +29,7 @@ fn describe_or_it_errors_on_all_inner_parser_error() {
 
 #[test]
 fn describe_or_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Or::of(list![
-        Single('a'),
-        Unrecoverable::of(Single('b')),
-        Single('c')
-    ]);
+    let parser = Or::of(list![Just('a'), Unrecoverable::of(Just('b')), Just('c')]);
     assert_eq!(
         parser.parse("c"),
         Err(ParseError {
@@ -85,13 +81,13 @@ fn describe_or_it_errors_on_inner_parser_unrecoverable_error() {
 
 #[test]
 fn describe_sequence_it_works() {
-    let parser = Sequence::of(list![Single('a'), Single('b'), Single('c')]);
+    let parser = Sequence::of(list![Just('a'), Just('b'), Just('c')]);
     assert_eq!(parser.parse("abcd"), Ok((vec!['a', 'b', 'c'], "d")));
 }
 
 #[test]
 fn describe_sequence_it_errors_on_inner_parser_error() {
-    let parser = Sequence::of(list![Single('a'), Single('b'), Single('c')]);
+    let parser = Sequence::of(list![Just('a'), Just('b'), Just('c')]);
     assert_eq!(
         parser.parse("abd"),
         Err(ParseError {
@@ -103,11 +99,7 @@ fn describe_sequence_it_errors_on_inner_parser_error() {
 
 #[test]
 fn describe_sequence_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Sequence::of(list![
-        Single('a'),
-        Unrecoverable::of(Single('b')),
-        Single('c')
-    ]);
+    let parser = Sequence::of(list![Just('a'), Unrecoverable::of(Just('b')), Just('c')]);
     assert_eq!(
         parser.parse("adc"),
         Err(ParseError {
@@ -120,15 +112,15 @@ fn describe_sequence_it_errors_on_inner_parser_unrecoverable_error() {
 #[test]
 fn describe_unrecoverable_it_works() {
     assert_eq!(
-        Unrecoverable::of(Single('a')).parse("b"),
+        Unrecoverable::of(Just('a')).parse("b"),
         Err(ParseError {
             recoverable: false,
-            inner_error: SingleError::Mismatch,
+            inner_error: JustError::Mismatch,
         })
     );
 }
 
 #[test]
 fn describe_unrecoverable_it_propagates_successes() {
-    assert_eq!(Unrecoverable::of(Single('a')).parse("a"), Ok(('a', "")));
+    assert_eq!(Unrecoverable::of(Just('a')).parse("a"), Ok(('a', "")));
 }
