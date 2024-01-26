@@ -13,7 +13,6 @@ fn describe_eof_it_errors_on_not_eof() {
     assert_eq!(
         Eof.parse("a"),
         Err(ParseError {
-            expected: "EOF".to_string(),
             recoverable: true,
             inner_error: EofError::NotEof
         })
@@ -30,7 +29,6 @@ fn describe_single_it_errors_on_mismatch() {
     assert_eq!(
         Single('a').parse("b"),
         Err(ParseError {
-            expected: "a".to_string(),
             recoverable: true,
             inner_error: SingleError::Mismatch
         })
@@ -42,7 +40,6 @@ fn describe_single_it_errors_on_eof() {
     assert_eq!(
         Single('a').parse(""),
         Err(ParseError {
-            expected: "a".to_string(),
             recoverable: true,
             inner_error: SingleError::Eof
         })

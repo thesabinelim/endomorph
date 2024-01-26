@@ -21,7 +21,6 @@ fn describe_or_it_errors_on_all_inner_parser_error() {
     assert_eq!(
         parser.parse("d"),
         Err(ParseError {
-            expected: "a or b or c".to_string(),
             recoverable: true,
             inner_error: OrError::AllFailed
         })
@@ -38,7 +37,6 @@ fn describe_or_it_errors_on_inner_parser_unrecoverable_error() {
     assert_eq!(
         parser.parse("c"),
         Err(ParseError {
-            expected: "b".to_string(),
             recoverable: false,
             inner_error: OrError::Unrecoverable
         })
@@ -97,7 +95,6 @@ fn describe_sequence_it_errors_on_inner_parser_error() {
     assert_eq!(
         parser.parse("abd"),
         Err(ParseError {
-            expected: "a, b, c".to_string(),
             recoverable: true,
             inner_error: SequenceError::Failed
         })
@@ -114,7 +111,6 @@ fn describe_sequence_it_errors_on_inner_parser_unrecoverable_error() {
     assert_eq!(
         parser.parse("adc"),
         Err(ParseError {
-            expected: "b".to_string(),
             recoverable: false,
             inner_error: SequenceError::Unrecoverable
         })
@@ -126,7 +122,6 @@ fn describe_unrecoverable_it_works() {
     assert_eq!(
         Unrecoverable::of(Single('a')).parse("b"),
         Err(ParseError {
-            expected: "a".to_string(),
             recoverable: false,
             inner_error: SingleError::Mismatch,
         })

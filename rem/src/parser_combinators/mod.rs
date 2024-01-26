@@ -12,14 +12,11 @@ pub trait Parser<Input>: Clone + PartialEq {
     type Output: Clone + PartialEq + Debug;
     type Error;
 
-    fn expected(&self) -> String;
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>>;
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct ParseError<Error> {
-    pub expected: String,
     pub recoverable: bool,
     pub inner_error: Error,
 }

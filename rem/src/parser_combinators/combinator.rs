@@ -37,19 +37,11 @@ where
     type Output = Output;
     type Error = OrError;
 
-    fn expected(&self) -> String {
-        let ListPat![parser, ..rest] = &self.0;
-        let expected = parser.expected();
-        let rest_expected = Or::of(rest.clone()).expected();
-        format!("{} or {}", expected, rest_expected)
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let ListPat![parser, ..rest] = &self.0;
         match parser.parse(input.clone()) {
             Ok(result) => Ok(result),
             Err(ParseError {
-                expected,
                 recoverable,
                 inner_error: _,
             }) => {
@@ -57,18 +49,15 @@ where
                     match Or::of(rest.clone()).parse(input) {
                         Ok(result) => Ok(result),
                         Err(ParseError {
-                            expected,
                             recoverable,
                             inner_error: _,
                         }) => Err(if recoverable {
                             ParseError {
-                                expected: self.expected(),
                                 recoverable,
                                 inner_error: OrError::AllFailed,
                             }
                         } else {
                             ParseError {
-                                expected,
                                 recoverable,
                                 inner_error: OrError::Unrecoverable,
                             }
@@ -76,7 +65,6 @@ where
                     }
                 } else {
                     Err(ParseError {
-                        expected,
                         recoverable,
                         inner_error: OrError::Unrecoverable,
                     })
@@ -95,28 +83,20 @@ where
     type Output = Output;
     type Error = OrError;
 
-    fn expected(&self) -> String {
-        let ListPat![parser, .._] = &self.0;
-        parser.expected()
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let ListPat![parser, .._] = &self.0;
         match parser.parse(input) {
             Ok(result) => Ok(result),
             Err(ParseError {
-                expected,
                 recoverable,
                 inner_error: _,
             }) => Err(if recoverable {
                 ParseError {
-                    expected: self.expected(),
                     recoverable,
                     inner_error: OrError::AllFailed,
                 }
             } else {
                 ParseError {
-                    expected,
                     recoverable,
                     inner_error: OrError::Unrecoverable,
                 }
@@ -193,13 +173,6 @@ where
     type Output = Vec<Output>;
     type Error = SequenceError;
 
-    fn expected(&self) -> String {
-        let ListPat![parser, ..rest] = &self.0;
-        let expected = parser.expected();
-        let rest_expected = Sequence::of(rest.clone()).expected();
-        format!("{}, {}", expected, rest_expected)
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let ListPat![parser, ..rest] = &self.0;
         match parser.parse(input.clone()) {
@@ -208,36 +181,30 @@ where
                     Ok((vec![vec![output], rest_output].concat(), next_input))
                 }
                 Err(ParseError {
-                    expected,
                     recoverable,
                     inner_error: _,
                 }) => Err(if recoverable {
                     ParseError {
-                        expected: self.expected(),
                         recoverable,
                         inner_error: SequenceError::Failed,
                     }
                 } else {
                     ParseError {
-                        expected,
                         recoverable,
                         inner_error: SequenceError::Unrecoverable,
                     }
                 }),
             },
             Err(ParseError {
-                expected,
                 recoverable,
                 inner_error: _,
             }) => Err(if recoverable {
                 ParseError {
-                    expected: self.expected(),
                     recoverable,
                     inner_error: SequenceError::Failed,
                 }
             } else {
                 ParseError {
-                    expected,
                     recoverable,
                     inner_error: SequenceError::Unrecoverable,
                 }
@@ -255,28 +222,20 @@ where
     type Output = Vec<Output>;
     type Error = SequenceError;
 
-    fn expected(&self) -> String {
-        let ListPat![parser, .._] = &self.0;
-        parser.expected()
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let ListPat![parser, .._] = &self.0;
         match parser.parse(input) {
             Ok((output, next_input)) => Ok((vec![output], next_input)),
             Err(ParseError {
-                expected,
                 recoverable,
                 inner_error: _,
             }) => Err(if recoverable {
                 ParseError {
-                    expected: self.expected(),
                     recoverable,
                     inner_error: SequenceError::Failed,
                 }
             } else {
                 ParseError {
-                    expected,
                     recoverable,
                     inner_error: SequenceError::Unrecoverable,
                 }
@@ -309,19 +268,13 @@ where
     type Output = InnerParser::Output;
     type Error = InnerParser::Error;
 
-    fn expected(&self) -> String {
-        self.0.expected()
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         match self.0.parse(input) {
             Ok(result) => Ok(result),
             Err(ParseError {
-                expected,
                 recoverable: _,
                 inner_error,
             }) => Err(ParseError {
-                expected,
                 recoverable: false,
                 inner_error,
             }),

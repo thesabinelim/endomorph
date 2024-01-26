@@ -17,14 +17,9 @@ where
     type Output = ();
     type Error = EofError;
 
-    fn expected(&self) -> String {
-        "EOF".to_string()
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         match input.next() {
             Ok(_) => Err(ParseError {
-                expected: "EOF".to_string(),
                 recoverable: true,
                 inner_error: EofError::NotEof,
             }),
@@ -50,10 +45,6 @@ where
     type Output = Input::Token;
     type Error = SingleError;
 
-    fn expected(&self) -> String {
-        self.0.to_string()
-    }
-
     fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
         let Single(expected) = self;
         match input.next() {
@@ -62,14 +53,12 @@ where
                     Ok((actual, rest))
                 } else {
                     Err(ParseError {
-                        expected: expected.to_string(),
                         recoverable: true,
                         inner_error: SingleError::Mismatch,
                     })
                 }
             }
             Err(TokenStreamError::Eof) => Err(ParseError {
-                expected: expected.to_string(),
                 recoverable: true,
                 inner_error: SingleError::Eof,
             }),
