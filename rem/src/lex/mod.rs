@@ -15,7 +15,7 @@ pub fn lex(source: SourceId, offset: Offset, text: String) -> (Vec<Token>, Vec<P
     };
     match Tokens.parse(input) {
         Ok((output, _)) => output,
-        Err(_) => todo!(),
+        Err(_) => panic!("Internal compiler error!"),
     }
 }
 
