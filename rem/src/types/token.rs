@@ -1,98 +1,89 @@
-// use super::source::SourcePosition;
+use super::source::Span;
 
-// pub struct Token {
-//     pub kind: TokenKind,
-//     pub start: SourcePosition,
-//     pub end: SourcePosition,
-// }
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub struct Token {
+    pub kind: TokenKind,
+    pub location: Span,
+    pub text: String,
+}
 
-// pub enum TokenKind {
-//     Comment(Comment),
-//     EndOfInput,
-//     Identifier(Identifier),
-//     Keyword(Keyword),
-//     Literal(Literal),
-//     Operator(Operator),
-//     Punctuator(Punctuator),
-//     Whitespace(Whitespace),
-// }
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub enum TokenKind {
+    Comment,
+    Dedent(usize),
+    Eof,
+    Error,
+    Identifier,
+    Indent(usize),
+    Keyword(Keyword),
+    LineBreak,
+    Literal(Literal),
+    Punctuation(Punctuation),
+}
 
-// pub struct Comment {
-//     pub text: String,
-// }
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub enum Keyword {
+    Else,
+    Export,
+    For,
+    From,
+    If,
+    In,
+    Import,
+    Let,
+    Mut,
+}
 
-// pub struct Identifier {
-//     pub name: String,
-// }
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub enum Literal {
+    Boolean,
+    Char,
+    Integer,
+    Float,
+    String,
+}
 
-// pub enum Keyword {
-//     Else,
-//     Export,
-//     For,
-//     From,
-//     If,
-//     In,
-//     Import,
-//     Let,
-//     Mut,
-// }
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub enum Punctuation {
+    And,
+    AndAnd,
+    BSlash,
+    Caret,
+    Colon,
+    Comma,
+    Dash,
+    Dot,
+    Ellipsis,
+    Eq,
+    EqEq,
+    Exclaim,
+    ExclaimEq,
+    FSlash,
+    Gt,
+    GtEq,
+    GtGt,
+    GtGtGt,
+    LBrace,
+    LBracket,
+    LParens,
+    Lt,
+    LtEq,
+    LtLt,
+    Modulo,
+    NotEq,
+    Pipe,
+    PipePipe,
+    Plus,
+    Question,
+    RArrow,
+    RBrace,
+    RBracket,
+    RParens,
+    Star,
+    StarStar,
+}
 
-// pub enum Literal {
-//     Boolean,
-//     Char,
-//     Integer,
-//     Float,
-//     String,
-// }
-
-// pub enum Operator {
-//     And,
-//     AndAssign,
-//     Arrow,
-//     Assign,
-//     Divide,
-//     DivideAssign,
-//     Dot,
-//     Equality,
-//     Greater,
-//     GreaterEquals,
-//     Less,
-//     LessEquals,
-//     LShift,
-//     LShiftAssign,
-//     Minus,
-//     MinusAssign,
-//     Modulo,
-//     ModuloAssign,
-//     Not,
-//     NotEquals,
-//     Or,
-//     OrAssign,
-//     Plus,
-//     PlusAssign,
-//     Power,
-//     PowerAssign,
-//     Ternary,
-//     RShift,
-//     RShiftAssign,
-//     Spread,
-//     Times,
-//     TimesAssign,
-//     Xor,
-//     XorAssign,
-// }
-
-// pub enum Punctuator {
-//     Colon,
-//     Comma,
-//     LBrace,
-//     LBracket,
-//     LParens,
-//     RBrace,
-//     RBracket,
-//     RParens,
-// }
-
-// pub struct Whitespace {
-//     pub text: String,
-// }
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub struct Whitespace {
+    pub text: String,
+}
