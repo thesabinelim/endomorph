@@ -24,14 +24,14 @@ pub enum TokenKind {
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub enum Keyword {
     Else,
-    Export,
     For,
     From,
     If,
     In,
-    Import,
     Let,
     Mut,
+    Pub,
+    Use,
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
