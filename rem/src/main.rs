@@ -1,3 +1,4 @@
+mod diagnostics;
 mod io;
 mod lex;
 mod parser_combinators;

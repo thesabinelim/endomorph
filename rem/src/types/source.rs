@@ -1,13 +1,13 @@
 use std::path::PathBuf;
 
-#[derive(Clone)]
-pub enum Source {
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub enum SourceId {
     File(PathBuf),
     Stdin,
 }
 
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub struct Span {
-    pub source: Source,
     pub start: Offset,
     pub end: Offset,
 }
