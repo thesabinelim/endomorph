@@ -46,14 +46,24 @@ where
     }
 }
 
-pub fn fail() -> Fail {
-    Fail
+pub fn fail() -> Fail<()> {
+    Fail::new()
+}
+
+pub fn fail_as<Output>() -> Fail<Output> {
+    Fail::<Output>::new()
 }
 
 #[derive(Clone)]
-pub struct Fail;
+pub struct Fail<Output>(PhantomData<Output>);
 
-impl<Input> Parser<Input> for Fail
+impl<Output> Fail<Output> {
+    pub fn new() -> Self {
+        Fail(PhantomData)
+    }
+}
+
+impl<Input, Output> Parser<Input> for Fail<Output>
 where
     Input: ParserInput,
 {
