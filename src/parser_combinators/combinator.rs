@@ -3,7 +3,59 @@ use core::marker::PhantomData;
 use super::{ParseResult, Parser, ParserInput, ParserList};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
-// TODO: Catch (MapErr?), Maybe, While
+// TODO: Maybe, While
+
+// pub fn catch<Input, InnerParser>(
+//     output: InnerParser::Output,
+//     inner_parser: InnerParser,
+// ) -> Catch<Input, InnerParser>
+// where
+//     Input: ParserInput,
+//     InnerParser: Parser<Input>,
+// {
+//     Catch::of(output, inner_parser)
+// }
+
+// #[derive(Clone)]
+// pub struct Catch<Input, InnerParser>
+// where
+//     Input: ParserInput,
+//     InnerParser: Parser<Input>,
+// {
+//     pub output: InnerParser::Output,
+//     pub inner_parser: InnerParser,
+//     input: PhantomData<Input>,
+// }
+
+// impl<Input, InnerParser> Catch<Input, InnerParser>
+// where
+//     Input: ParserInput,
+//     InnerParser: Parser<Input>,
+// {
+//     pub fn of(output: InnerParser::Output, inner_parser: InnerParser) -> Self {
+//         Catch {
+//             output,
+//             inner_parser,
+//             input: PhantomData,
+//         }
+//     }
+// }
+
+// impl<Input, InnerParser> Parser<Input> for Catch<Input, InnerParser>
+// where
+//     Input: ParserInput,
+//     InnerParser: Parser<Input>,
+// {
+//     type Output = InnerParser::Output;
+
+//     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+//         let (result, next_input) = self.inner_parser.parse(input);
+//         match result {
+//             Some(output) => (Some(output), next_input),
+//             None => (None, input.clone()),
+//         }
+//     }
+// }
 
 pub fn map<Input, Output, MapFn, InnerParser>(
     map_fn: MapFn,
