@@ -1,6 +1,6 @@
 use crate::{
     diagnostics::Problem,
-    parser_combinators::{ParseError, Parser, TokenStream, TokenStreamError},
+    parser_combinators::{ParseResult, Parser, ParserInput},
     types::{
         source::{Offset, SourceId},
         token::Token,
@@ -8,54 +8,50 @@ use crate::{
 };
 
 pub fn lex(source: SourceId, offset: Offset, text: String) -> (Vec<Token>, Vec<Problem>) {
-    let input = CharStream {
+    let input = StringParserInput {
         source,
         text,
         offset,
     };
-    match Tokens.parse(input) {
-        Ok((output, _)) => output,
-        Err(_) => panic!("Internal compiler error!"),
+    let (result, _) = Tokens.parse(&input);
+    match result {
+        Some(output) => output,
+        None => panic!("Internal compiler error!"),
     }
 }
 
 #[derive(Clone, PartialEq)]
 struct Tokens;
 
-impl Parser<CharStream> for Tokens {
+impl Parser<StringParserInput> for Tokens {
     type Output = (Vec<Token>, Vec<Problem>);
 
-    type Error = ();
-
-    fn parse(
-        &self,
-        input: CharStream,
-    ) -> Result<(Self::Output, CharStream), ParseError<Self::Error>> {
+    fn parse(&self, input: &StringParserInput) -> ParseResult<StringParserInput, Self::Output> {
         todo!()
     }
 }
 
 #[derive(Clone, PartialEq)]
-struct CharStream {
+struct StringParserInput {
     pub source: SourceId,
     pub text: String,
     pub offset: Offset,
 }
 
-impl TokenStream for CharStream {
+impl ParserInput for StringParserInput {
     type Token = char;
 
-    fn next(&self) -> Result<(Self::Token, Self), TokenStreamError> {
+    fn next(&self) -> Option<(Self::Token, Self)> {
         match self.text.char_indices().next() {
-            Some((_, first)) => Ok((
+            Some((_, first)) => Some((
                 first,
-                CharStream {
+                StringParserInput {
                     source: self.source.clone(),
                     text: self.text[first.len_utf8()..].to_string(),
                     offset: self.offset + 1,
                 },
             )),
-            None => Err(TokenStreamError::Eof),
+            None => None,
         }
     }
 }

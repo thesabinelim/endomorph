@@ -10,16 +10,11 @@ mod tests;
 
 pub trait Parser<Input>: Clone + PartialEq {
     type Output: Clone + PartialEq + Debug;
-    type Error;
 
-    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>>;
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output>;
 }
 
-#[derive(Clone, Eq, PartialEq, Debug)]
-pub struct ParseError<Error> {
-    pub recoverable: bool,
-    pub inner_error: Error,
-}
+pub type ParseResult<Input, Output> = (Option<Output>, Input);
 
 pub trait ParserList<Input>: List + Clone + PartialEq {}
 
@@ -43,36 +38,8 @@ where
 
 impl<Input, Output> LikeParserList<Input, Output> for ListOf![] {}
 
-pub trait TokenStream: Clone + PartialEq {
+pub trait ParserInput: Clone + PartialEq {
     type Token: Clone + Eq;
 
-    fn next(&self) -> Result<(Self::Token, Self), TokenStreamError>;
-}
-
-pub enum TokenStreamError {
-    Eof,
-}
-
-impl TokenStream for &str {
-    type Token = char;
-
-    fn next(&self) -> Result<(char, Self), TokenStreamError> {
-        let mut iter = self.char_indices();
-        match iter.next() {
-            Some((_, first)) => Ok((first, &self[first.len_utf8()..])),
-            None => Err(TokenStreamError::Eof),
-        }
-    }
-}
-
-impl TokenStream for String {
-    type Token = char;
-
-    fn next(&self) -> Result<(char, Self), TokenStreamError> {
-        let mut iter = self.char_indices();
-        match iter.next() {
-            Some((_, first)) => Ok((first, self[first.len_utf8()..].to_string())),
-            None => Err(TokenStreamError::Eof),
-        }
-    }
+    fn next(&self) -> Option<(Self::Token, Self)>;
 }

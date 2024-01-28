@@ -1,47 +1,29 @@
 use crate::parser_combinators::{
-    parser::{Eof, EofError, Just, JustError},
-    ParseError, Parser,
+    parser::{End, Just},
+    Parser,
 };
 
 #[test]
-fn describe_eof_it_works() {
-    assert_eq!(Eof.parse(""), Ok(((), "")));
+fn describe_end_it_succeeds_on_input_end() {
+    assert_eq!(End.parse(&""), (Some(()), ""));
 }
 
 #[test]
-fn describe_eof_it_errors_on_not_eof() {
-    assert_eq!(
-        Eof.parse("a"),
-        Err(ParseError {
-            recoverable: true,
-            inner_error: EofError::NotEof
-        })
-    );
+fn describe_end_it_fails_on_not_input_end() {
+    assert_eq!(End.parse(&"a"), (None, "a"));
 }
 
 #[test]
-fn describe_just_it_works() {
-    assert_eq!(Just('a').parse("a"), Ok(('a', "")));
+fn describe_just_it_succeeds_on_match() {
+    assert_eq!(Just('a').parse(&"a"), (Some('a'), ""));
 }
 
 #[test]
-fn describe_just_it_errors_on_mismatch() {
-    assert_eq!(
-        Just('a').parse("b"),
-        Err(ParseError {
-            recoverable: true,
-            inner_error: JustError::Mismatch
-        })
-    );
+fn describe_just_it_fails_on_mismatch() {
+    assert_eq!(Just('a').parse(&"b"), (None, "b"));
 }
 
 #[test]
-fn describe_just_it_errors_on_eof() {
-    assert_eq!(
-        Just('a').parse(""),
-        Err(ParseError {
-            recoverable: true,
-            inner_error: JustError::Eof
-        })
-    );
+fn describe_just_it_fails_on_input_end() {
+    assert_eq!(Just('a').parse(&""), (None, ""));
 }

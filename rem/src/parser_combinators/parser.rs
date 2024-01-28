@@ -1,67 +1,50 @@
 use core::fmt::{Debug, Display};
 
-use super::{ParseError, Parser, TokenStream, TokenStreamError};
+use super::{ParseResult, Parser, ParserInput};
+
+// TODO: Match, Succeed, Fail
 
 #[derive(Clone, PartialEq)]
-pub struct Eof;
+pub struct End;
 
-#[derive(Debug, Eq, PartialEq)]
-pub enum EofError {
-    NotEof,
-}
-
-impl<Input> Parser<Input> for Eof
+impl<Input> Parser<Input> for End
 where
-    Input: TokenStream,
+    Input: ParserInput,
 {
     type Output = ();
-    type Error = EofError;
 
-    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
-        match input.next() {
-            Ok(_) => Err(ParseError {
-                recoverable: true,
-                inner_error: EofError::NotEof,
-            }),
-            Err(_) => Ok(((), input)),
-        }
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        (
+            match input.next() {
+                Some(_) => None,
+                None => Some(()),
+            },
+            input.clone(),
+        )
     }
 }
 
 #[derive(Clone, PartialEq)]
 pub struct Just<Token>(pub Token);
 
-#[derive(Debug, Eq, PartialEq)]
-pub enum JustError {
-    Mismatch,
-    Eof,
-}
-
 impl<Input> Parser<Input> for Just<Input::Token>
 where
-    Input: TokenStream,
+    Input: ParserInput,
     Input::Token: Clone + Display + Eq + Debug,
 {
     type Output = Input::Token;
-    type Error = JustError;
 
-    fn parse(&self, input: Input) -> Result<(Self::Output, Input), ParseError<Self::Error>> {
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
         let Just(expected) = self;
         match input.next() {
-            Ok((actual, rest)) => {
+            Some((actual, next_input)) => {
                 if actual == *expected {
-                    Ok((actual, rest))
+                    (Some(actual), next_input)
                 } else {
-                    Err(ParseError {
-                        recoverable: true,
-                        inner_error: JustError::Mismatch,
-                    })
+                    (None, input.clone())
                 }
             }
-            Err(TokenStreamError::Eof) => Err(ParseError {
-                recoverable: true,
-                inner_error: JustError::Eof,
-            }),
+            None => (None, input.clone()),
         }
     }
 }

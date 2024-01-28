@@ -1,126 +1,34 @@
 use crate::{
     parser_combinators::{
-        combinator::{Or, OrError, Sequence, SequenceError, Unrecoverable},
-        parser::{Just, JustError},
-        ParseError, Parser,
+        combinator::{Or, Seq},
+        parser::Just,
+        Parser,
     },
     types::list::list,
 };
 
 #[test]
-fn describe_or_it_works() {
+fn describe_or_it_succeeds_if_some_inner_parser_succeeds() {
     let parser = Or::of(list![Just('a'), Just('b'), Just('c')]);
-    assert_eq!(parser.parse("a"), Ok(('a', "")));
-    assert_eq!(parser.parse("b"), Ok(('b', "")));
-    assert_eq!(parser.parse("c"), Ok(('c', "")));
+    assert_eq!(parser.parse(&"a"), (Some('a'), ""));
+    assert_eq!(parser.parse(&"b"), (Some('b'), ""));
+    assert_eq!(parser.parse(&"c"), (Some('c'), ""));
 }
 
 #[test]
-fn describe_or_it_errors_on_all_inner_parser_error() {
+fn describe_or_it_fails_if_all_inner_parsers_fail() {
     let parser = Or::of(list![Just('a'), Just('b'), Just('c')]);
-    assert_eq!(
-        parser.parse("d"),
-        Err(ParseError {
-            recoverable: true,
-            inner_error: OrError::AllFailed
-        })
-    );
+    assert_eq!(parser.parse(&"d"), (None, "d"));
 }
-
-#[test]
-fn describe_or_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Or::of(list![Just('a'), Unrecoverable::of(Just('b')), Just('c')]);
-    assert_eq!(
-        parser.parse("c"),
-        Err(ParseError {
-            recoverable: false,
-            inner_error: OrError::Unrecoverable
-        })
-    );
-}
-
-// #[test]
-// fn describe_some_it_works_with_no_matches() {
-//     let inner_parser = test_match('a');
-//     let parser = some(inner_parser);
-//     assert!(parser("b").is_ok_and(|ParseSuccess { result, rest }| result == vec![]));
-// }
-
-// #[test]
-// fn describe_some_it_works_with_one_match() {
-//     let inner_parser = test_match('a');
-//     let parser = some(inner_parser);
-//     assert!(parser(TestTokenStream::from("aba"))
-//         .is_ok_and(|(_, productions)| productions == vec![TestToken::A]));
-// }
-
-// #[test]
-// fn describe_some_it_works_with_several_matches() {
-//     let inner_parser = test_match('a');
-//     let parser = some(inner_parser);
-//     assert!(parser(TestTokenStream::from("aaaba")).is_ok_and(
-//         |(_, productions)| productions == vec![TestToken::A, TestToken::A, TestToken::A]
-//     ));
-// }
-
-// #[test]
-// fn describe_produce_it_works() {
-//     let inner_parser = test_match('a');
-//     let parser = produce(TestToken::B, inner_parser);
-//     assert!(
-//         parser(TestTokenStream::from("a")).is_ok_and(|(_, production)| production == TestToken::B)
-//     );
-// }
-
-// #[test]
-// fn describe_produce_it_errors_on_inner_parser_error() {
-//     let inner_parser = test_match('a');
-//     let parser = produce(TestToken::A, inner_parser);
-//     assert!(parser(TestTokenStream::from("b")).is_err());
-// }
 
 #[test]
 fn describe_sequence_it_works() {
-    let parser = Sequence::of(list![Just('a'), Just('b'), Just('c')]);
-    assert_eq!(parser.parse("abcd"), Ok((vec!['a', 'b', 'c'], "d")));
+    let parser = Seq::of(list![Just('a'), Just('b'), Just('c')]);
+    assert_eq!(parser.parse(&"abcd"), (Some(vec!['a', 'b', 'c']), "d"));
 }
 
 #[test]
 fn describe_sequence_it_errors_on_inner_parser_error() {
-    let parser = Sequence::of(list![Just('a'), Just('b'), Just('c')]);
-    assert_eq!(
-        parser.parse("abd"),
-        Err(ParseError {
-            recoverable: true,
-            inner_error: SequenceError::Failed
-        })
-    );
-}
-
-#[test]
-fn describe_sequence_it_errors_on_inner_parser_unrecoverable_error() {
-    let parser = Sequence::of(list![Just('a'), Unrecoverable::of(Just('b')), Just('c')]);
-    assert_eq!(
-        parser.parse("adc"),
-        Err(ParseError {
-            recoverable: false,
-            inner_error: SequenceError::Unrecoverable
-        })
-    );
-}
-
-#[test]
-fn describe_unrecoverable_it_works() {
-    assert_eq!(
-        Unrecoverable::of(Just('a')).parse("b"),
-        Err(ParseError {
-            recoverable: false,
-            inner_error: JustError::Mismatch,
-        })
-    );
-}
-
-#[test]
-fn describe_unrecoverable_it_propagates_successes() {
-    assert_eq!(Unrecoverable::of(Just('a')).parse("a"), Ok(('a', "")));
+    let parser = Seq::of(list![Just('a'), Just('b'), Just('c')]);
+    assert_eq!(parser.parse(&"abd"), (None, "abd"),);
 }
