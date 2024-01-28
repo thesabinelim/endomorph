@@ -55,13 +55,13 @@ macro_rules! ListPat {
 
 pub(crate) use ListPat;
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)
 where
     Item: Clone,
     Rest: List;
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Nil;
 
 pub trait List: Clone {
