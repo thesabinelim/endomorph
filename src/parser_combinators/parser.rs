@@ -4,6 +4,10 @@ use super::{ParseResult, Parser, ParserInput};
 
 // TODO: Succeed, Fail
 
+pub fn end() -> End {
+    End
+}
+
 #[derive(Clone)]
 pub struct End;
 
@@ -22,6 +26,13 @@ where
             input.clone(),
         )
     }
+}
+
+pub fn just<Token>(expected: Token) -> Just<Token>
+where
+    Token: PartialEq,
+{
+    Just(expected)
 }
 
 #[derive(Clone)]
@@ -49,8 +60,15 @@ where
     }
 }
 
+pub fn matches<Token, Predicate>(predicate: Predicate) -> Matches<Token, Predicate>
+where
+    Predicate: Fn(Token) -> bool + Clone,
+{
+    Matches::of(predicate)
+}
+
 #[derive(Clone)]
-pub struct Match<Token, Predicate>
+pub struct Matches<Token, Predicate>
 where
     Predicate: Fn(Token) -> bool + Clone,
 {
@@ -58,19 +76,19 @@ where
     token: PhantomData<Token>,
 }
 
-impl<Token, Predicate> Match<Token, Predicate>
+impl<Token, Predicate> Matches<Token, Predicate>
 where
     Predicate: Fn(Token) -> bool + Clone,
 {
     pub fn of(predicate: Predicate) -> Self {
-        Match {
+        Matches {
             predicate,
             token: PhantomData,
         }
     }
 }
 
-impl<Input, Predicate> Parser<Input> for Match<Input::Token, Predicate>
+impl<Input, Predicate> Parser<Input> for Matches<Input::Token, Predicate>
 where
     Input: ParserInput,
     Input::Token: PartialEq,

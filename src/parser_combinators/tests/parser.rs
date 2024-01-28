@@ -1,44 +1,44 @@
 use crate::parser_combinators::{
-    parser::{End, Just, Match},
+    parser::{end, just, matches},
     Parser,
 };
 
 #[test]
 fn describe_end_it_succeeds_on_input_end() {
-    assert_eq!(End.parse(&""), (Some(()), ""));
+    assert_eq!(end().parse(&""), (Some(()), ""));
 }
 
 #[test]
 fn describe_end_it_fails_on_not_input_end() {
-    assert_eq!(End.parse(&"a"), (None, "a"));
+    assert_eq!(end().parse(&"a"), (None, "a"));
 }
 
 #[test]
 fn describe_just_it_succeeds_on_match() {
-    assert_eq!(Just('a').parse(&"a"), (Some('a'), ""));
+    assert_eq!(just('a').parse(&"a"), (Some('a'), ""));
 }
 
 #[test]
 fn describe_just_it_fails_on_mismatch() {
-    assert_eq!(Just('a').parse(&"b"), (None, "b"));
+    assert_eq!(just('a').parse(&"b"), (None, "b"));
 }
 
 #[test]
 fn describe_just_it_fails_on_input_end() {
-    assert_eq!(Just('a').parse(&""), (None, ""));
+    assert_eq!(just('a').parse(&""), (None, ""));
 }
 
 #[test]
-fn describe_match_it_succeeds_on_match() {
-    assert_eq!(Match::of(|token| token == 'a').parse(&"a"), (Some('a'), ""))
+fn describe_matches_it_succeeds_on_match() {
+    assert_eq!(matches(|c| c == 'a').parse(&"a"), (Some('a'), ""))
 }
 
 #[test]
-fn describe_match_it_fails_on_mismatch() {
-    assert_eq!(Match::of(|token| token == 'a').parse(&"b"), (None, "b"))
+fn describe_matches_it_fails_on_mismatch() {
+    assert_eq!(matches(|c| c == 'a').parse(&"b"), (None, "b"))
 }
 
 #[test]
-fn describe_match_it_fails_on_eof() {
-    assert_eq!(Match::of(|token| token == 'a').parse(&""), (None, ""))
+fn describe_matches_it_fails_on_eof() {
+    assert_eq!(matches(|c| c == 'a').parse(&""), (None, ""))
 }

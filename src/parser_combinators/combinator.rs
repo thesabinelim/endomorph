@@ -5,6 +5,14 @@ use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
 // TODO: Not, To, Catch, Maybe, While
 
+pub fn or<Input, Output, Parsers>(parsers: Parsers) -> Or<Input, Output, Parsers>
+where
+    Input: ParserInput,
+    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+{
+    Or::of(parsers)
+}
+
 #[derive(Clone)]
 pub struct Or<Input, Output, Parsers>
 where
@@ -66,6 +74,14 @@ where
             None => (None, input.clone()),
         }
     }
+}
+
+pub fn seq<Input, Output, Parsers>(parsers: Parsers) -> Seq<Input, Output, Parsers>
+where
+    Input: ParserInput,
+    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+{
+    Seq::of(parsers)
 }
 
 #[derive(Clone)]
