@@ -1,11 +1,35 @@
 use crate::{
     parser_combinators::{
-        combinator::{or, seq, to},
-        parser::just,
+        combinator::{map, or, seq, to},
+        parser::{just, one_of},
         Parser,
     },
     types::list::list,
 };
+
+#[test]
+fn describe_map_it_overwrites_output_if_inner_parser_succeeds() {
+    let parser = map(
+        |c| match c {
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+            _ => panic!("should not reach this point"),
+        },
+        one_of(vec!['a', 'b', 'c']),
+    );
+    assert_eq!(parser.parse(&"a"), (Some(1), ""));
+    assert_eq!(parser.parse(&"b"), (Some(2), ""));
+    assert_eq!(parser.parse(&"c"), (Some(3), ""));
+}
+
+#[test]
+fn describe_map_it_fails_if_inner_parser_fails() {
+    assert_eq!(
+        map(|_| "should not appear", just('a')).parse(&"b"),
+        (None, "b")
+    );
+}
 
 #[test]
 fn describe_or_it_succeeds_if_some_inner_parser_succeeds() {
@@ -44,10 +68,10 @@ fn describe_to_it_overwrites_output_if_inner_parser_succeeds() {
     assert_eq!(
         to("overwritten", just('a')).parse(&"a"),
         (Some("overwritten"), "")
-    )
+    );
 }
 
 #[test]
 fn describe_to_it_fails_if_inner_parser_fails() {
-    assert_eq!(to("should not appear", just('a')).parse(&"b"), (None, "b"))
+    assert_eq!(to("should not appear", just('a')).parse(&"b"), (None, "b"));
 }

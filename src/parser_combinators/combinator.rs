@@ -3,7 +3,71 @@ use core::marker::PhantomData;
 use super::{ParseResult, Parser, ParserInput, ParserList};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
-// TODO: Catch (MapErr?), Maybe, While, Map
+// TODO: Catch (MapErr?), Maybe, While
+
+pub fn map<Input, Output, MapFn, InnerParser>(
+    map_fn: MapFn,
+    inner_parser: InnerParser,
+) -> Map<Input, Output, MapFn, InnerParser>
+where
+    Input: ParserInput,
+    Output: Clone,
+    MapFn: Fn(InnerParser::Output) -> Output,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    Map::of(map_fn, inner_parser)
+}
+
+#[derive(Clone)]
+pub struct Map<Input, Output, MapFn, InnerParser>
+where
+    Input: ParserInput,
+    Output: Clone,
+    MapFn: Fn(InnerParser::Output) -> Output,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    pub map_fn: MapFn,
+    pub inner_parser: InnerParser,
+    input: PhantomData<Input>,
+}
+
+impl<Input, Output, MapFn, InnerParser> Map<Input, Output, MapFn, InnerParser>
+where
+    Input: ParserInput,
+    Output: Clone,
+    MapFn: Fn(InnerParser::Output) -> Output,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    pub fn of(map_fn: MapFn, inner_parser: InnerParser) -> Self {
+        Map {
+            map_fn,
+            inner_parser,
+            input: PhantomData,
+        }
+    }
+}
+
+impl<Input, Output, MapFn, InnerParser> Parser<Input> for Map<Input, Output, MapFn, InnerParser>
+where
+    Input: ParserInput,
+    Output: Clone,
+    MapFn: Fn(InnerParser::Output) -> Output,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    type Output = Output;
+
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        let (result, next_input) = self.inner_parser.parse(input);
+        match result {
+            Some(output) => (Some((self.map_fn)(output.clone())), next_input),
+            None => (None, input.clone()),
+        }
+    }
+}
 
 pub fn or<Input, Output, Parsers>(parsers: Parsers) -> Or<Input, Output, Parsers>
 where
@@ -158,6 +222,7 @@ pub fn to<Input, Output, InnerParser>(
     inner_parser: InnerParser,
 ) -> To<Input, Output, InnerParser>
 where
+    Input: ParserInput,
     Output: Clone,
     InnerParser: Parser<Input>,
 {
@@ -167,6 +232,7 @@ where
 #[derive(Clone)]
 pub struct To<Input, Output, InnerParser>
 where
+    Input: ParserInput,
     Output: Clone,
     InnerParser: Parser<Input>,
 {
@@ -177,6 +243,7 @@ where
 
 impl<Input, Output, InnerParser> To<Input, Output, InnerParser>
 where
+    Input: ParserInput,
     Output: Clone,
     InnerParser: Parser<Input>,
 {
