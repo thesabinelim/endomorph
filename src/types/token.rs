@@ -11,7 +11,6 @@ pub struct Token {
 pub enum TokenKind {
     Comment,
     Dedent(usize),
-    Eof,
     Error,
     Identifier,
     Indent(usize),
