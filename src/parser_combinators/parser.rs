@@ -64,7 +64,7 @@ where
 
 pub fn matches<Token, Predicate>(predicate: Predicate) -> Matches<Token, Predicate>
 where
-    Predicate: Fn(Token) -> bool + Clone,
+    Predicate: Fn(Token) -> bool,
 {
     Matches::of(predicate)
 }
