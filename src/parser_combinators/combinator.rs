@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{LikeParserList, ParseResult, Parser, ParserInput};
+use super::{ParseResult, Parser, ParserInput, ParserList};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
 // TODO: To, Catch (MapErr?), Maybe, While, Map
@@ -8,7 +8,7 @@ use crate::types::list::{ListOf, ListPat, NonEmptyList};
 pub fn or<Input, Output, Parsers>(parsers: Parsers) -> Or<Input, Output, Parsers>
 where
     Input: ParserInput,
-    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+    Parsers: ParserList<Input, Output> + NonEmptyList + Clone,
 {
     Or::of(parsers)
 }
@@ -17,7 +17,7 @@ where
 pub struct Or<Input, Output, Parsers>
 where
     Input: ParserInput,
-    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+    Parsers: ParserList<Input, Output> + NonEmptyList + Clone,
 {
     pub parsers: Parsers,
     input: PhantomData<Input>,
@@ -27,7 +27,7 @@ where
 impl<Input, Output, Parsers> Or<Input, Output, Parsers>
 where
     Input: ParserInput,
-    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+    Parsers: ParserList<Input, Output> + NonEmptyList + Clone,
 {
     pub fn of(parsers: Parsers) -> Self {
         Or {
@@ -42,8 +42,8 @@ impl<Input, Output, Item, Rest> Parser<Input> for Or<Input, Output, ListOf![Item
 where
     Input: ParserInput,
     Output: Clone,
-    Item: Parser<Input, Output = Output>,
-    Rest: LikeParserList<Input, Output> + NonEmptyList,
+    Item: Parser<Input, Output = Output> + Clone,
+    Rest: ParserList<Input, Output> + NonEmptyList + Clone,
     Or<Input, Output, Rest>: Parser<Input, Output = Output>,
 {
     type Output = Output;
@@ -62,7 +62,7 @@ impl<Input, Output, Item> Parser<Input> for Or<Input, Output, ListOf![Item]>
 where
     Input: ParserInput,
     Output: Clone,
-    Item: Parser<Input, Output = Output>,
+    Item: Parser<Input, Output = Output> + Clone,
 {
     type Output = Output;
 
@@ -79,7 +79,7 @@ where
 pub fn seq<Input, Output, Parsers>(parsers: Parsers) -> Seq<Input, Output, Parsers>
 where
     Input: ParserInput,
-    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+    Parsers: ParserList<Input, Output> + NonEmptyList + Clone,
 {
     Seq::of(parsers)
 }
@@ -88,7 +88,7 @@ where
 pub struct Seq<Input, Output, Parsers>
 where
     Input: ParserInput,
-    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+    Parsers: ParserList<Input, Output> + NonEmptyList + Clone,
 {
     pub parsers: Parsers,
     input: PhantomData<Input>,
@@ -98,7 +98,7 @@ where
 impl<Input, Output, Parsers> Seq<Input, Output, Parsers>
 where
     Input: ParserInput,
-    Parsers: LikeParserList<Input, Output> + NonEmptyList,
+    Parsers: ParserList<Input, Output> + NonEmptyList + Clone,
 {
     pub fn of(parsers: Parsers) -> Self {
         Seq {
@@ -113,8 +113,8 @@ impl<Input, Output, Item, Rest> Parser<Input> for Seq<Input, Output, ListOf![Ite
 where
     Input: ParserInput,
     Output: Clone,
-    Item: Parser<Input, Output = Output>,
-    Rest: LikeParserList<Input, Output> + NonEmptyList,
+    Item: Parser<Input, Output = Output> + Clone,
+    Rest: ParserList<Input, Output> + NonEmptyList + Clone,
     Seq<Input, Output, Rest>: Parser<Input, Output = Vec<Output>>,
 {
     type Output = Vec<Output>;
@@ -139,7 +139,7 @@ impl<Input, Output, Item> Parser<Input> for Seq<Input, Output, ListOf![Item]>
 where
     Input: ParserInput,
     Output: Clone,
-    Item: Parser<Input, Output = Output>,
+    Item: Parser<Input, Output = Output> + Clone,
 {
     type Output = Vec<Output>;
 

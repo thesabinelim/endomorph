@@ -72,7 +72,7 @@ where
 #[derive(Clone)]
 pub struct Matches<Token, Predicate>
 where
-    Predicate: Fn(Token) -> bool + Clone,
+    Predicate: Fn(Token) -> bool,
 {
     pub predicate: Predicate,
     token: PhantomData<Token>,
@@ -80,7 +80,7 @@ where
 
 impl<Token, Predicate> Matches<Token, Predicate>
 where
-    Predicate: Fn(Token) -> bool + Clone,
+    Predicate: Fn(Token) -> bool,
 {
     pub fn of(predicate: Predicate) -> Self {
         Matches {
@@ -93,8 +93,8 @@ where
 impl<Input, Predicate> Parser<Input> for Matches<Input::Token, Predicate>
 where
     Input: ParserInput,
-    Input::Token: PartialEq,
-    Predicate: Fn(Input::Token) -> bool + Clone,
+    Input::Token: PartialEq + Clone,
+    Predicate: Fn(Input::Token) -> bool,
 {
     type Output = Input::Token;
 
