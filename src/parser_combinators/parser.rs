@@ -36,7 +36,9 @@ where
 }
 
 #[derive(Clone)]
-pub struct Just<Token>(pub Token);
+pub struct Just<Token>(pub Token)
+where
+    Token: PartialEq;
 
 impl<Input> Parser<Input> for Just<Input::Token>
 where
@@ -46,9 +48,9 @@ where
     type Output = Input::Token;
 
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
-        let Just(expected) = self;
         match input.next() {
             Some((actual, next_input)) => {
+                let Just(expected) = self;
                 if actual == *expected {
                     (Some(actual), next_input)
                 } else {
@@ -72,7 +74,7 @@ pub struct Matches<Token, Predicate>
 where
     Predicate: Fn(Token) -> bool + Clone,
 {
-    predicate: Predicate,
+    pub predicate: Predicate,
     token: PhantomData<Token>,
 }
 
@@ -100,6 +102,40 @@ where
         match input.next() {
             Some((token, next_input)) => {
                 if (self.predicate)(token.clone()) {
+                    (Some(token), next_input)
+                } else {
+                    (None, input.clone())
+                }
+            }
+            None => (None, input.clone()),
+        }
+    }
+}
+
+pub fn one_of<Token>(tokens: Vec<Token>) -> OneOf<Token>
+where
+    Token: PartialEq,
+{
+    OneOf(tokens)
+}
+
+#[derive(Clone)]
+pub struct OneOf<Token>(pub Vec<Token>)
+where
+    Token: PartialEq;
+
+impl<Input> Parser<Input> for OneOf<Input::Token>
+where
+    Input: ParserInput,
+    Input::Token: PartialEq,
+{
+    type Output = Input::Token;
+
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        match input.next() {
+            Some((token, next_input)) => {
+                let OneOf(expected) = self;
+                if expected.contains(&token) {
                     (Some(token), next_input)
                 } else {
                     (None, input.clone())

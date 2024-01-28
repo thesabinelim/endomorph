@@ -19,7 +19,7 @@ where
     Input: ParserInput,
     Parsers: LikeParserList<Input, Output> + NonEmptyList,
 {
-    parsers: Parsers,
+    pub parsers: Parsers,
     input: PhantomData<Input>,
     output: PhantomData<Output>,
 }
@@ -90,7 +90,7 @@ where
     Input: ParserInput,
     Parsers: LikeParserList<Input, Output> + NonEmptyList,
 {
-    parsers: Parsers,
+    pub parsers: Parsers,
     input: PhantomData<Input>,
     output: PhantomData<Output>,
 }
