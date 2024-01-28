@@ -48,6 +48,24 @@ where
     }
 }
 
+pub fn fail() -> Fail {
+    Fail
+}
+
+#[derive(Clone)]
+pub struct Fail;
+
+impl<Input> Parser<Input> for Fail
+where
+    Input: ParserInput,
+{
+    type Output = ();
+
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        (None, input.clone())
+    }
+}
+
 pub fn just<Token>(expected: Token) -> Matches<Token, impl Fn(Token) -> bool + Clone>
 where
     Token: Eq + Copy,

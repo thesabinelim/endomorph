@@ -1,11 +1,11 @@
 use crate::parser_combinators::{
-    parser::{emit, end, just, matches, one_of},
+    parser::{emit, end, fail, just, matches, one_of},
     Parser,
 };
 
 #[test]
 fn describe_emit_it_works() {
-    assert_eq!(emit(2).parse(&"che"), (Some(2), "che"));
+    assert_eq!(emit("emitted").parse(&"a"), (Some("emitted"), "a"));
 }
 
 #[test]
@@ -16,6 +16,11 @@ fn describe_end_it_succeeds_on_input_end() {
 #[test]
 fn describe_end_it_fails_on_not_input_end() {
     assert_eq!(end().parse(&"a"), (None, "a"));
+}
+
+#[test]
+fn describe_fail_it_works() {
+    assert_eq!(fail().parse(&"a"), (None, "a"))
 }
 
 #[test]
