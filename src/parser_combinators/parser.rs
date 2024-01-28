@@ -28,38 +28,11 @@ where
     }
 }
 
-pub fn just<Token>(expected: Token) -> Just<Token>
+pub fn just<Token>(expected: Token) -> Matches<Token, impl Fn(Token) -> bool + Clone>
 where
-    Token: Eq,
+    Token: Eq + Copy,
 {
-    Just(expected)
-}
-
-#[derive(Clone)]
-pub struct Just<Token>(pub Token)
-where
-    Token: Eq;
-
-impl<Input> Parser<Input> for Just<Input::Token>
-where
-    Input: ParserInput,
-    Input::Token: Eq,
-{
-    type Output = Input::Token;
-
-    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
-        match input.next() {
-            Some((actual, next_input)) => {
-                let Just(expected) = self;
-                if actual == *expected {
-                    (Some(actual), next_input)
-                } else {
-                    (None, input.clone())
-                }
-            }
-            None => (None, input.clone()),
-        }
-    }
+    matches(move |token| token == expected)
 }
 
 pub fn matches<Token, Predicate>(predicate: Predicate) -> Matches<Token, Predicate>
@@ -112,36 +85,9 @@ where
     }
 }
 
-pub fn one_of<Token>(tokens: Vec<Token>) -> OneOf<Token>
+pub fn one_of<Token>(expected: Vec<Token>) -> Matches<Token, impl Fn(Token) -> bool + Clone>
 where
-    Token: Eq,
+    Token: Eq + Copy,
 {
-    OneOf(tokens)
-}
-
-#[derive(Clone)]
-pub struct OneOf<Token>(pub Vec<Token>)
-where
-    Token: Eq;
-
-impl<Input> Parser<Input> for OneOf<Input::Token>
-where
-    Input: ParserInput,
-    Input::Token: Eq,
-{
-    type Output = Input::Token;
-
-    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
-        match input.next() {
-            Some((token, next_input)) => {
-                let OneOf(expected) = self;
-                if expected.contains(&token) {
-                    (Some(token), next_input)
-                } else {
-                    (None, input.clone())
-                }
-            }
-            None => (None, input.clone()),
-        }
-    }
+    matches(move |token| expected.contains(&token))
 }
