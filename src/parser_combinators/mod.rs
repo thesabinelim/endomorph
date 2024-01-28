@@ -1,5 +1,3 @@
-use core::fmt::Debug;
-
 use crate::types::list::{List, ListOf};
 
 pub mod combinator;
@@ -8,15 +6,15 @@ pub mod parser;
 #[cfg(test)]
 mod tests;
 
-pub trait Parser<Input>: Clone + PartialEq {
-    type Output: Clone + PartialEq + Debug;
+pub trait Parser<Input>: Clone {
+    type Output;
 
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output>;
 }
 
 pub type ParseResult<Input, Output> = (Option<Output>, Input);
 
-pub trait ParserList<Input>: List + Clone + PartialEq {}
+pub trait ParserList<Input>: List {}
 
 impl<Input, Item, Rest> ParserList<Input> for ListOf![Item, ..Rest]
 where
@@ -38,7 +36,7 @@ where
 
 impl<Input, Output> LikeParserList<Input, Output> for ListOf![] {}
 
-pub trait ParserInput: Clone + PartialEq {
+pub trait ParserInput: Clone {
     type Token: Clone + Eq;
 
     fn next(&self) -> Option<(Self::Token, Self)>;

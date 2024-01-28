@@ -1,4 +1,3 @@
-use core::fmt::Debug;
 use core::marker::PhantomData;
 
 use super::{LikeParserList, ParseResult, Parser, ParserInput};
@@ -6,7 +5,7 @@ use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
 // TODO: Not, To, Catch, Maybe, While
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct Or<Input, Output, Parsers>
 where
     Input: ParserInput,
@@ -34,7 +33,7 @@ where
 impl<Input, Output, Item, Rest> Parser<Input> for Or<Input, Output, ListOf![Item, ..Rest]>
 where
     Input: ParserInput,
-    Output: Clone + PartialEq + Debug,
+    Output: Clone,
     Item: Parser<Input, Output = Output>,
     Rest: LikeParserList<Input, Output> + NonEmptyList,
     Or<Input, Output, Rest>: Parser<Input, Output = Output>,
@@ -54,7 +53,7 @@ where
 impl<Input, Output, Item> Parser<Input> for Or<Input, Output, ListOf![Item]>
 where
     Input: ParserInput,
-    Output: Clone + PartialEq + Debug,
+    Output: Clone,
     Item: Parser<Input, Output = Output>,
 {
     type Output = Output;
@@ -69,7 +68,7 @@ where
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct Seq<Input, Output, Parsers>
 where
     Input: ParserInput,
@@ -97,7 +96,7 @@ where
 impl<Input, Output, Item, Rest> Parser<Input> for Seq<Input, Output, ListOf![Item, ..Rest]>
 where
     Input: ParserInput,
-    Output: Clone + PartialEq + Debug,
+    Output: Clone,
     Item: Parser<Input, Output = Output>,
     Rest: LikeParserList<Input, Output> + NonEmptyList,
     Seq<Input, Output, Rest>: Parser<Input, Output = Vec<Output>>,
@@ -123,7 +122,7 @@ where
 impl<Input, Output, Item> Parser<Input> for Seq<Input, Output, ListOf![Item]>
 where
     Input: ParserInput,
-    Output: Clone + PartialEq + Debug,
+    Output: Clone,
     Item: Parser<Input, Output = Output>,
 {
     type Output = Vec<Output>;
