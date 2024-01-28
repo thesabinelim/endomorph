@@ -26,7 +26,7 @@ where
 impl<Input, Output> ParserList<Input, Output> for ListOf![] {}
 
 pub trait ParserInput: Clone {
-    type Token: Clone + Eq;
+    type Token: Eq + Copy;
 
     fn next(&self) -> Option<(Self::Token, Self)>;
 }
