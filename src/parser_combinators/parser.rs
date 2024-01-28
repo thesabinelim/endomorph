@@ -2,7 +2,27 @@ use std::marker::PhantomData;
 
 use super::{ParseResult, Parser, ParserInput};
 
-// TODO: Succeed, Fail
+// TODO: Fail
+
+pub fn emit<Output>(output: Output) -> Emit<Output> {
+    Emit(output)
+}
+
+#[derive(Clone)]
+pub struct Emit<Output>(pub Output);
+
+impl<Input, Output> Parser<Input> for Emit<Output>
+where
+    Input: ParserInput,
+    Output: Clone,
+{
+    type Output = Output;
+
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        let Emit(output) = self;
+        (Some(output.clone()), input.clone())
+    }
+}
 
 pub fn end() -> End {
     End

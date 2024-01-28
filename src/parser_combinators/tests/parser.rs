@@ -1,7 +1,12 @@
 use crate::parser_combinators::{
-    parser::{end, just, matches, one_of},
+    parser::{emit, end, just, matches, one_of},
     Parser,
 };
+
+#[test]
+fn describe_emit_it_works() {
+    assert_eq!(emit(2).parse(&"che"), (Some(2), "che"));
+}
 
 #[test]
 fn describe_end_it_succeeds_on_input_end() {
