@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use super::{LikeParserList, ParseResult, Parser, ParserInput};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
-// TODO: Not, To, Catch (MapErr?), Maybe, While, Map
+// TODO: To, Catch (MapErr?), Maybe, While, Map
 
 pub fn or<Input, Output, Parsers>(parsers: Parsers) -> Or<Input, Output, Parsers>
 where
