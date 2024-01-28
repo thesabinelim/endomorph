@@ -58,38 +58,33 @@ pub(crate) use ListPat;
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Cons<Item, Rest>(pub Item, pub Rest)
 where
-    Item: Clone,
     Rest: List;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Nil;
 
-pub trait List: Clone {
+pub trait List {
     const LEN: usize;
 
     fn len(&self) -> usize {
         Self::LEN
     }
 
-    type AppendResult<T>: List
-    where
-        T: Clone;
+    type AppendResult<T>: List;
 
-    fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone;
+    fn append<T>(self, item: T) -> Self::AppendResult<T>;
 
     type ConcatResult<T>: List
     where
         T: List;
 
-    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List;
 
     type Reversed: List;
 
-    fn reverse(&self) -> Self::Reversed;
+    fn reverse(self) -> Self::Reversed;
 }
 
 pub trait NonEmptyList: List {
@@ -106,46 +101,39 @@ pub trait EmptyList: List {}
 
 impl<Item, Rest> List for Cons<Item, Rest>
 where
-    Item: Clone,
     Rest: List,
 {
     const LEN: usize = Rest::LEN + 1;
 
-    type AppendResult<T> = Cons<Item, Rest::AppendResult<T>>
-    where
-        T: Clone;
+    type AppendResult<T> = Cons<Item, Rest::AppendResult<T>>;
 
-    fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone,
-    {
+    fn append<T>(self, item: T) -> Self::AppendResult<T> {
         let Cons(self_item, rest) = self;
-        Cons(self_item.clone(), rest.append(item))
+        Cons(self_item, rest.append(item))
     }
 
     type ConcatResult<T> = Cons<Item, Rest::ConcatResult<T>>
     where
         T: List;
 
-    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List,
     {
         let Cons(item, rest) = self;
-        Cons(item.clone(), rest.concat(list))
+        Cons(item, rest.concat(list))
     }
 
     type Reversed = <Rest::Reversed as List>::AppendResult<Item>;
 
-    fn reverse(&self) -> Self::Reversed {
+    fn reverse(self) -> Self::Reversed {
         let Cons(item, rest) = self;
-        rest.reverse().append(item.clone())
+        rest.reverse().append(item)
     }
 }
 
 impl<Item, Rest> NonEmptyList for Cons<Item, Rest>
 where
-    Item: Clone,
     Rest: NonEmptyList,
 {
     type Item = Item;
@@ -161,10 +149,7 @@ where
     }
 }
 
-impl<Item> NonEmptyList for Cons<Item, Nil>
-where
-    Item: Clone,
-{
+impl<Item> NonEmptyList for Cons<Item, Nil> {
     type Item = Item;
     type LastItem = Item;
     type Rest = Nil;
@@ -180,14 +165,9 @@ where
 impl List for Nil {
     const LEN: usize = 0;
 
-    type AppendResult<T> = Cons<T, Self>
-    where
-        T: Clone;
+    type AppendResult<T> = Cons<T, Self>;
 
-    fn append<T>(&self, item: T) -> Self::AppendResult<T>
-    where
-        T: Clone,
-    {
+    fn append<T>(self, item: T) -> Self::AppendResult<T> {
         Cons(item, Nil)
     }
 
@@ -195,7 +175,7 @@ impl List for Nil {
     where
         T: List;
 
-    fn concat<T>(&self, list: T) -> Self::ConcatResult<T>
+    fn concat<T>(self, list: T) -> Self::ConcatResult<T>
     where
         T: List,
     {
@@ -204,8 +184,8 @@ impl List for Nil {
 
     type Reversed = Self;
 
-    fn reverse(&self) -> Self::Reversed {
-        self.clone()
+    fn reverse(self) -> Self::Reversed {
+        self
     }
 }
 
