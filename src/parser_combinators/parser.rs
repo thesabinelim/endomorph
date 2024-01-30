@@ -3,11 +3,13 @@ use std::marker::PhantomData;
 use super::{ParseResult, Parser, ParserInput};
 
 pub fn emit<Output>(output: Output) -> Emit<Output> {
-    Emit(output)
+    Emit { output }
 }
 
 #[derive(Clone)]
-pub struct Emit<Output>(pub Output);
+pub struct Emit<Output> {
+    pub output: Output,
+}
 
 impl<Input, Output> Parser<Input> for Emit<Output>
 where
@@ -17,8 +19,7 @@ where
     type Output = Output;
 
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
-        let Emit(output) = self;
-        (Some(output.clone()), input.clone())
+        (Some(self.output.clone()), input.clone())
     }
 }
 
@@ -74,13 +75,16 @@ pub fn just<Token>(expected: Token) -> Just<Token>
 where
     Token: Eq,
 {
-    Just(expected)
+    Just { expected }
 }
 
 #[derive(Clone)]
-pub struct Just<Token>(pub Token)
+pub struct Just<Token>
 where
-    Token: Eq;
+    Token: Eq,
+{
+    pub expected: Token,
+}
 
 impl<Input> Parser<Input> for Just<Input::Token>
 where
@@ -92,8 +96,7 @@ where
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
         match input.next() {
             Some((actual, next_input)) => {
-                let Just(expected) = self;
-                if actual == *expected {
+                if actual == self.expected {
                     (Some(actual), next_input)
                 } else {
                     (None, input.clone())
@@ -154,17 +157,20 @@ where
     }
 }
 
-pub fn one_of<Token>(tokens: Vec<Token>) -> OneOf<Token>
+pub fn one_of<Token>(expected: Vec<Token>) -> OneOf<Token>
 where
     Token: Eq,
 {
-    OneOf(tokens)
+    OneOf { expected }
 }
 
 #[derive(Clone)]
-pub struct OneOf<Token>(pub Vec<Token>)
+pub struct OneOf<Token>
 where
-    Token: Eq;
+    Token: Eq,
+{
+    pub expected: Vec<Token>,
+}
 
 impl<Input> Parser<Input> for OneOf<Input::Token>
 where
@@ -176,8 +182,7 @@ where
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
         match input.next() {
             Some((token, next_input)) => {
-                let OneOf(expected) = self;
-                if expected.contains(&token) {
+                if self.expected.contains(&token) {
                     (Some(token), next_input)
                 } else {
                     (None, input.clone())
