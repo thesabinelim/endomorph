@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use super::{ParseResult, Parser, ParserInput, ParserList};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
-// TODO: Maybe, While
+// TODO: While
 
 // pub fn catch<Input, InnerParser>(
 //     output: InnerParser::Output,
@@ -117,6 +117,53 @@ where
         match result {
             Some(output) => (Some((self.map_fn)(output.clone())), next_input),
             None => (None, input.clone()),
+        }
+    }
+}
+
+pub fn maybe<Input, InnerParser>(inner_parser: InnerParser) -> Maybe<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    Maybe::of(inner_parser)
+}
+
+#[derive(Clone)]
+pub struct Maybe<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    pub inner_parser: InnerParser,
+    input: PhantomData<Input>,
+}
+
+impl<Input, InnerParser> Maybe<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    pub fn of(inner_parser: InnerParser) -> Self {
+        Maybe {
+            inner_parser,
+            input: PhantomData,
+        }
+    }
+}
+
+impl<Input, InnerParser> Parser<Input> for Maybe<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    type Output = Option<InnerParser::Output>;
+
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        let (result, next_input) = self.inner_parser.parse(input);
+        match result {
+            Some(output) => (Some(Some(output)), next_input),
+            None => (Some(None), input.clone()),
         }
     }
 }

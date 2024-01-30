@@ -1,6 +1,6 @@
 use crate::{
     parser_combinators::{
-        combinator::{map, or, seq, to},
+        combinator::{map, maybe, or, seq, to},
         parser::{just, one_of},
         Parser,
     },
@@ -29,6 +29,16 @@ fn describe_map_it_fails_if_inner_parser_fails() {
         map(|_| "should not appear", just('a')).parse(&"b"),
         (None, "b")
     );
+}
+
+#[test]
+fn describe_maybe_it_wraps_output_in_some_if_inner_parser_succeeds() {
+    assert_eq!(maybe(just('a')).parse(&"a"), (Some(Some('a')), ""));
+}
+
+#[test]
+fn describe_maybe_it_outputs_none_if_inner_parser_fails() {
+    assert_eq!(maybe(just('a')).parse(&"b"), (Some(None), "b"));
 }
 
 #[test]
