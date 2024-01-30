@@ -125,6 +125,55 @@ where
     }
 }
 
+pub fn repeat<Input, InnerParser>(inner_parser: InnerParser) -> Repeat<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    Repeat::of(inner_parser)
+}
+
+#[derive(Clone)]
+pub struct Repeat<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    pub inner_parser: InnerParser,
+    input: PhantomData<Input>,
+}
+
+impl<Input, InnerParser> Repeat<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    pub fn of(inner_parser: InnerParser) -> Self {
+        Repeat {
+            inner_parser,
+            input: PhantomData,
+        }
+    }
+}
+
+impl<Input, InnerParser> Parser<Input> for Repeat<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+{
+    type Output = Vec<InnerParser::Output>;
+
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        let mut output: Self::Output = vec![];
+        let mut next_input = input.to_owned();
+        while let (Some(inner_output), inner_next_input) = self.inner_parser.parse(&next_input) {
+            output.push(inner_output);
+            next_input = inner_next_input;
+        }
+        (Some(output), next_input.clone())
+    }
+}
+
 pub fn maybe<Input, InnerParser>(inner_parser: InnerParser) -> Maybe<Input, InnerParser>
 where
     Input: ParserInput,

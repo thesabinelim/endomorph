@@ -1,6 +1,6 @@
 use crate::{
     parser_combinators::{
-        combinator::{catch, map, maybe, or, seq, to},
+        combinator::{catch, map, maybe, or, repeat, seq, to},
         parser::{just, one_of},
         Parser,
     },
@@ -64,6 +64,24 @@ fn describe_or_it_fails_if_all_inner_parsers_fail() {
     assert_eq!(
         or(list![just('a'), just('b'), just('c')]).parse(&"d"),
         (None, "d")
+    );
+}
+
+#[test]
+fn describe_repeat_it_succeeds_if_inner_parser_succeeds_0_times() {
+    assert_eq!(repeat(just('a')).parse(&"b"), (Some(vec![]), "b"));
+}
+
+#[test]
+fn describe_repeat_it_succeeds_if_inner_parser_succeeds_1_time() {
+    assert_eq!(repeat(just('a')).parse(&"a"), (Some(vec!['a']), ""));
+}
+
+#[test]
+fn describe_repeat_it_succeeds_if_inner_parser_succeeds_many_times() {
+    assert_eq!(
+        repeat(just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
     );
 }
 
