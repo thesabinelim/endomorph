@@ -3,8 +3,6 @@ use core::marker::PhantomData;
 use super::{ParseResult, Parser, ParserInput, ParserList};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
-// TODO: While
-
 pub fn catch<Input, InnerParser>(
     output: InnerParser::Output,
     inner_parser: InnerParser,
