@@ -5,57 +5,61 @@ use crate::types::list::{ListOf, ListPat, NonEmptyList};
 
 // TODO: While
 
-// pub fn catch<Input, InnerParser>(
-//     output: InnerParser::Output,
-//     inner_parser: InnerParser,
-// ) -> Catch<Input, InnerParser>
-// where
-//     Input: ParserInput,
-//     InnerParser: Parser<Input>,
-// {
-//     Catch::of(output, inner_parser)
-// }
+pub fn catch<Input, InnerParser>(
+    output: InnerParser::Output,
+    inner_parser: InnerParser,
+) -> Catch<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    Catch::of(output, inner_parser)
+}
 
-// #[derive(Clone)]
-// pub struct Catch<Input, InnerParser>
-// where
-//     Input: ParserInput,
-//     InnerParser: Parser<Input>,
-// {
-//     pub output: InnerParser::Output,
-//     pub inner_parser: InnerParser,
-//     input: PhantomData<Input>,
-// }
+#[derive(Clone)]
+pub struct Catch<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    pub output: InnerParser::Output,
+    pub inner_parser: InnerParser,
+    input: PhantomData<Input>,
+}
 
-// impl<Input, InnerParser> Catch<Input, InnerParser>
-// where
-//     Input: ParserInput,
-//     InnerParser: Parser<Input>,
-// {
-//     pub fn of(output: InnerParser::Output, inner_parser: InnerParser) -> Self {
-//         Catch {
-//             output,
-//             inner_parser,
-//             input: PhantomData,
-//         }
-//     }
-// }
+impl<Input, InnerParser> Catch<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    pub fn of(output: InnerParser::Output, inner_parser: InnerParser) -> Self {
+        Catch {
+            output,
+            inner_parser,
+            input: PhantomData,
+        }
+    }
+}
 
-// impl<Input, InnerParser> Parser<Input> for Catch<Input, InnerParser>
-// where
-//     Input: ParserInput,
-//     InnerParser: Parser<Input>,
-// {
-//     type Output = InnerParser::Output;
+impl<Input, InnerParser> Parser<Input> for Catch<Input, InnerParser>
+where
+    Input: ParserInput,
+    InnerParser: Parser<Input>,
+    InnerParser::Output: Clone,
+{
+    type Output = InnerParser::Output;
 
-//     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
-//         let (result, next_input) = self.inner_parser.parse(input);
-//         match result {
-//             Some(output) => (Some(output), next_input),
-//             None => (None, input.clone()),
-//         }
-//     }
-// }
+    fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
+        let (result, next_input) = self.inner_parser.parse(input);
+        match result {
+            Some(output) => (Some(output), next_input),
+            None => (Some(self.output.clone()), input.clone()),
+        }
+    }
+}
 
 pub fn map<Input, Output, MapFn, InnerParser>(
     map_fn: MapFn,

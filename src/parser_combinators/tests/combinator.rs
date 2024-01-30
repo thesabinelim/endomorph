@@ -1,11 +1,21 @@
 use crate::{
     parser_combinators::{
-        combinator::{map, maybe, or, seq, to},
+        combinator::{catch, map, maybe, or, seq, to},
         parser::{just, one_of},
         Parser,
     },
     types::list::list,
 };
+
+#[test]
+fn describe_catch_it_overwrites_output_if_inner_parser_fails() {
+    assert_eq!(catch('b', just('a')).parse(&"b"), (Some('b'), "b"));
+}
+
+#[test]
+fn describe_catch_it_returns_original_output_if_inner_parser_succeeds() {
+    assert_eq!(catch('b', just('a')).parse(&"a"), (Some('a'), ""));
+}
 
 #[test]
 fn describe_map_it_overwrites_output_if_inner_parser_succeeds() {
