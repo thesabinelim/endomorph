@@ -46,12 +46,8 @@ where
     }
 }
 
-pub fn fail() -> Fail<()> {
+pub fn fail<Output>() -> Fail<Output> {
     Fail::new()
-}
-
-pub fn fail_as<Output>() -> Fail<Output> {
-    Fail::<Output>::new()
 }
 
 #[derive(Clone)]
@@ -67,7 +63,7 @@ impl<Input, Output> Parser<Input> for Fail<Output>
 where
     Input: ParserInput,
 {
-    type Output = ();
+    type Output = Output;
 
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
         (None, input.clone())

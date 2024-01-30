@@ -1,5 +1,5 @@
 use crate::parser_combinators::{
-    parser::{emit, end, fail, fail_as, just, matches, one_of},
+    parser::{emit, end, fail, just, matches, one_of},
     Parser,
 };
 
@@ -20,12 +20,7 @@ fn describe_end_it_fails_on_not_input_end() {
 
 #[test]
 fn describe_fail_it_works() {
-    assert_eq!(fail().parse(&"a"), (None, "a"));
-}
-
-#[test]
-fn describe_fail_as_it_works() {
-    assert_eq!(fail_as::<char>().parse(&"a"), (None, "a"));
+    assert_eq!(fail::<char>().parse(&"a"), (None, "a"));
 }
 
 #[test]
