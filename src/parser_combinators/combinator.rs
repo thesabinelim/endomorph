@@ -1,4 +1,5 @@
 use core::marker::PhantomData;
+use std::ops::{Bound, Range, RangeBounds};
 
 use super::{ParseResult, Parser, ParserInput, ParserList};
 use crate::types::list::{ListOf, ListPat, NonEmptyList};
@@ -123,52 +124,84 @@ where
     }
 }
 
-pub fn repeat<Input, InnerParser>(inner_parser: InnerParser) -> Repeat<Input, InnerParser>
+pub fn repeat<Input, Range, InnerParser>(
+    range: Range,
+    inner_parser: InnerParser,
+) -> Repeat<Input, Range, InnerParser>
 where
     Input: ParserInput,
+    Range: RangeBounds<u32>,
     InnerParser: Parser<Input>,
 {
-    Repeat::of(inner_parser)
+    Repeat::of(range, inner_parser)
 }
 
 #[derive(Clone)]
-pub struct Repeat<Input, InnerParser>
+pub struct Repeat<Input, Range, InnerParser>
 where
     Input: ParserInput,
+    Range: RangeBounds<u32>,
     InnerParser: Parser<Input>,
 {
+    pub range: Range,
     pub inner_parser: InnerParser,
     input: PhantomData<Input>,
 }
 
-impl<Input, InnerParser> Repeat<Input, InnerParser>
+impl<Input, Range, InnerParser> Repeat<Input, Range, InnerParser>
 where
     Input: ParserInput,
+    Range: RangeBounds<u32>,
     InnerParser: Parser<Input>,
 {
-    pub fn of(inner_parser: InnerParser) -> Self {
+    pub fn of(range: Range, inner_parser: InnerParser) -> Self {
         Repeat {
+            range,
             inner_parser,
             input: PhantomData,
         }
     }
 }
 
-impl<Input, InnerParser> Parser<Input> for Repeat<Input, InnerParser>
+impl<Input, Range, InnerParser> Parser<Input> for Repeat<Input, Range, InnerParser>
 where
     Input: ParserInput,
+    Range: RangeBounds<u32> + Clone,
     InnerParser: Parser<Input>,
 {
     type Output = Vec<InnerParser::Output>;
 
     fn parse(&self, input: &Input) -> ParseResult<Input, Self::Output> {
         let mut output: Self::Output = vec![];
-        let mut next_input = input.to_owned();
-        while let (Some(inner_output), inner_next_input) = self.inner_parser.parse(&next_input) {
-            output.push(inner_output);
+        let mut next_input = input.clone();
+        let min_matches = match self.range.start_bound() {
+            Bound::Included(n) => *n,
+            Bound::Excluded(n) => n + 1,
+            Bound::Unbounded => 0,
+        };
+        let max_matches = match self.range.end_bound() {
+            Bound::Included(n) => *n,
+            Bound::Excluded(n) => n - 1,
+            Bound::Unbounded => u32::MAX,
+        };
+
+        let mut n_matches = 0;
+        while n_matches < max_matches {
+            let (inner_result, inner_next_input) = self.inner_parser.parse(&next_input);
             next_input = inner_next_input;
+            match inner_result {
+                Some(inner_output) => {
+                    output.push(inner_output);
+                    n_matches += 1;
+                }
+                None => break,
+            }
         }
-        (Some(output), next_input.clone())
+        if n_matches >= min_matches {
+            (Some(output), next_input.clone())
+        } else {
+            (None, input.clone())
+        }
     }
 }
 

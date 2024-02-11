@@ -68,21 +68,167 @@ fn describe_or_it_fails_if_all_inner_parsers_fail() {
 }
 
 #[test]
-fn describe_repeat_it_succeeds_if_inner_parser_succeeds_0_times() {
-    assert_eq!(repeat(just('a')).parse(&"b"), (Some(vec![]), "b"));
+fn describe_repeat_range_full_it_succeeds_if_inner_parser_succeeds_1_time() {
+    assert_eq!(repeat(.., just('a')).parse(&"a"), (Some(vec!['a']), ""));
 }
 
 #[test]
-fn describe_repeat_it_succeeds_if_inner_parser_succeeds_1_time() {
-    assert_eq!(repeat(just('a')).parse(&"a"), (Some(vec!['a']), ""));
-}
-
-#[test]
-fn describe_repeat_it_succeeds_if_inner_parser_succeeds_many_times() {
+fn describe_repeat_range_full_it_succeeds_if_inner_parser_succeeds_several_times() {
     assert_eq!(
-        repeat(just('a')).parse(&"aaa"),
+        repeat(.., just('a')).parse(&"aaa"),
         (Some(vec!['a', 'a', 'a']), "")
     );
+}
+
+#[test]
+fn describe_repeat_range_full_it_succeeds_if_inner_parser_fails() {
+    assert_eq!(repeat(.., just('a')).parse(&"b"), (Some(vec![]), "b"));
+}
+
+#[test]
+fn describe_repeat_range_from_it_succeeds_if_inner_parser_succeeds_exactly_the_minimum_number_of_times(
+) {
+    assert_eq!(
+        repeat(3.., just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_from_it_succeeds_if_inner_parser_succeeds_more_than_the_minimum_number_of_times(
+) {
+    assert_eq!(
+        repeat(1.., just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_from_it_fails_if_inner_parser_succeeds_fewer_than_the_minimum_number_of_times(
+) {
+    assert_eq!(repeat(1.., just('a')).parse(&"b"), (None, "b"));
+}
+
+#[test]
+fn describe_repeat_range_to_it_succeeds_if_inner_parser_succeeds_less_than_the_maximum_number_of_times(
+) {
+    assert_eq!(repeat(..2, just('a')).parse(&"b"), (Some(vec![]), "b"));
+}
+
+#[test]
+fn describe_repeat_range_to_it_succeeds_if_inner_parser_succeeds_exactly_the_maximum_number_of_times(
+) {
+    assert_eq!(
+        repeat(..4, just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_to_it_does_not_match_more_than_the_maximum_number_of_times() {
+    assert_eq!(
+        repeat(..2, just('a')).parse(&"aaa"),
+        (Some(vec!['a']), "aa")
+    );
+}
+
+#[test]
+fn describe_repeat_range_to_inclusive_it_succeeds_if_inner_parser_succeeds_less_than_the_maximum_number_of_times(
+) {
+    assert_eq!(repeat(..=1, just('a')).parse(&"b"), (Some(vec![]), "b"));
+}
+
+#[test]
+fn describe_repeat_range_to_inclusive_it_succeeds_if_inner_parser_succeeds_exactly_the_maximum_number_of_times(
+) {
+    assert_eq!(
+        repeat(..=3, just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_to_inclusive_it_does_not_match_more_than_the_maximum_number_of_times() {
+    assert_eq!(
+        repeat(..=1, just('a')).parse(&"aaa"),
+        (Some(vec!['a']), "aa")
+    );
+}
+
+#[test]
+fn describe_repeat_range_it_succeeds_if_inner_parser_succeeds_exactly_the_minimum_number_of_times()
+{
+    assert_eq!(repeat(1..4, just('a')).parse(&"a"), (Some(vec!['a']), ""));
+}
+
+#[test]
+fn describe_repeat_range_it_succeeds_if_inner_parser_succeeds_exactly_the_maximum_number_of_times()
+{
+    assert_eq!(
+        repeat(1..4, just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_it_succeeds_if_inner_parser_succeeds_within_the_expected_number_of_times()
+{
+    assert_eq!(
+        repeat(1..4, just('a')).parse(&"aa"),
+        (Some(vec!['a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_it_does_not_match_more_than_the_maximum_number_of_times() {
+    assert_eq!(
+        repeat(1..2, just('a')).parse(&"aaa"),
+        (Some(vec!['a']), "aa")
+    );
+}
+
+#[test]
+fn describe_repeat_range_it_fails_if_inner_parser_succeeds_fewer_than_the_minimum_number_of_times()
+{
+    assert_eq!(repeat(1..2, just('a')).parse(&"b"), (None, "b"));
+}
+
+#[test]
+fn describe_repeat_range_inclusive_it_succeeds_if_inner_parser_succeeds_exactly_the_minimum_number_of_times(
+) {
+    assert_eq!(repeat(1..=3, just('a')).parse(&"a"), (Some(vec!['a']), ""));
+}
+
+#[test]
+fn describe_repeat_range_inclusive_it_succeeds_if_inner_parser_succeeds_exactly_the_maximum_number_of_times(
+) {
+    assert_eq!(
+        repeat(1..=3, just('a')).parse(&"aaa"),
+        (Some(vec!['a', 'a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_inclusive_it_succeeds_if_inner_parser_succeeds_within_the_expected_number_of_times(
+) {
+    assert_eq!(
+        repeat(1..=3, just('a')).parse(&"aa"),
+        (Some(vec!['a', 'a']), "")
+    );
+}
+
+#[test]
+fn describe_repeat_range_inclusive_it_does_not_match_more_than_the_maximum_number_of_times() {
+    assert_eq!(
+        repeat(1..=1, just('a')).parse(&"aaa"),
+        (Some(vec!['a']), "aa")
+    );
+}
+
+#[test]
+fn describe_repeat_range_inclusive_it_fails_if_inner_parser_succeeds_fewer_than_the_minimum_number_of_times(
+) {
+    assert_eq!(repeat(1..=1, just('a')).parse(&"b"), (None, "b"));
 }
 
 #[test]
